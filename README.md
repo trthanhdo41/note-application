@@ -56,20 +56,21 @@ A comprehensive web-based note application built with Java, Spring Boot, and MyS
    cd noteMyself
    
 2.	Set up the database:
+   ![erd](https://github.com/trthanhdo41/note-application/assets/136252271/2013d522-4e0d-41e0-b7c3-7e24654bc519)
 	•	Create a MySQL database.
 	•	Import the database backup file (database_backup.sql) into your MySQL database:
       mysql -u [username] -p [database_name] < database_backup.sql
   	
-3.	Update the database configuration:
+4.	Update the database configuration:
 	•	Update the src/main/resources/application.properties file with your database credentials:
     spring.datasource.url=jdbc:mysql://localhost:3306/[database_name]
     spring.datasource.username=[username]
     spring.datasource.password=[password]
   	
-4. Build the project:
+5. Build the project:
    mvn clean install
 
-5. Run the application: mvn spring-boot:run
+6. Run the application: mvn spring-boot:run
 
 Usage
 
