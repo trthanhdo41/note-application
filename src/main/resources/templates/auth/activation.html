@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kích hoạt tài khoản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .btn-primary:hover, .btn-secondary:hover {
+            transform: scale(1.05);
+        }
+        .card-header, .card-body {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card text-center">
+        <div class="card-header">
+            <h1 class="card-title" th:text="${message}"></h1>
+        </div>
+        <div class="card-body">
+            <p class="card-text" th:if="${message == 'Tài khoản của bạn đã được kích hoạt thành công.'}">
+                Tài khoản của bạn đã được kích hoạt thành công. Bạn có thể đăng nhập ngay bây giờ.
+            </p>
+            <p class="card-text" th:if="${message != 'Tài khoản của bạn đã được kích hoạt thành công.'}">
+                Token không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.
+            </p>
+            <a th:href="@{/auth/login}" th:if="${message == 'Tài khoản của bạn đã được kích hoạt thành công.'}" class="btn btn-primary">Đăng nhập</a>
+            <a th:href="@{/auth/register}" th:if="${message != 'Tài khoản của bạn đã được kích hoạt thành công.'}" class="btn btn-secondary">Đăng ký lại</a>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

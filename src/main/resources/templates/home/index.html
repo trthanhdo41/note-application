@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Trang chủ</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="team" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- Đường dẫn đến tệp CSS của Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Đường dẫn đến tệp CSS của Vegas -->
+    <link rel="stylesheet" href="/css1/vegas.min.css">
+    <!-- Đường dẫn đến tệp CSS của Font Awesome -->
+    <link rel="stylesheet" href="/css1/font-awesome.min.css">
+    <!-- Đường dẫn đến tệp CSS của Templatemo -->
+    <link rel="stylesheet" href="/css1/templatemo-style.css">
+    <link rel="stylesheet" href="output.css">
+    <!--font-->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+    <script>
+        window.onload = function () {
+            var marquee = document.querySelector('.marquee span');
+            marquee.style.animation = 'marquee 50s linear infinite';
+        };
+
+        function handleLogout(event) {
+            event.preventDefault();
+            var logoutForm = document.getElementById('logoutForm');
+            fetch(logoutForm.action, {
+                method: logoutForm.method,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(new FormData(logoutForm))
+            }).then(response => {
+                if (response.ok) {
+                    // Chuyển hướng về trang login
+                    window.location.href = '/auth/login';
+                } else {
+                    console.error('Logout failed');
+                }
+            }).catch(error => {
+                console.error('An error occurred:', error);
+            });
+        }
+    </script>
+
+    <style>
+        .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold; /* Đặt độ đậm cho font */
+        }
+
+        .navbar-nav .nav-link {
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold; /* Đặt độ đậm cho font */
+        }
+
+        .marquee {
+            width: 591px; /* Độ rộng */
+            height: 33px; /* Chiều cao */
+            overflow: hidden;
+            position: absolute;
+            top: 46px; /* Vị trí y */
+            left: 1161px; /* Vị trí x (cách nút "Xin chào" 5px) */
+            white-space: nowrap;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+            /* Bắt đầu từ vị trí 0px */
+            100% {
+                transform: translateX(-100%);
+            }
+            /* Di chuyển hết chiều rộng của phần marquee */
+        }
+
+        .marquee span {
+            display: inline-block;
+            color: #ff4464; /* Đặt màu chữ là màu xanh */
+        }
+
+        .navbar-nav {
+            display: flex;
+            overflow-x: auto; /* Cho phép cuộn ngang */
+            white-space: nowrap; /* Đảm bảo rằng các mục không bị ngắt dòng */
+        }
+
+        .navbar-nav::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .navbar-nav::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .navbar-nav::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+        .navbar-nav::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .logout-btn {
+            --black: #000000;
+            --ch-black: #141414;
+            --eer-black: #1b1b1b;
+            --night-rider: #2e2e2e;
+            --white: #ffffff;
+            --af-white: #f3f3f3;
+            --ch-white: #e1e1e1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition-duration: .3s;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+            background-color: var(--night-rider);
+        }
+
+        .logout-sign {
+            width: 100%;
+            transition-duration: .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logout-sign svg {
+            width: 17px;
+        }
+
+        .logout-sign svg path {
+            fill: var(--af-white);
+        }
+
+        .logout-text {
+            position: absolute;
+            right: 0%;
+            width: 0%;
+            opacity: 0;
+            color: var(--af-white);
+            font-size: 1.2em;
+            font-weight: 600;
+            transition-duration: .3s;
+        }
+
+        .logout-btn:hover {
+            width: 125px;
+            border-radius: 5px;
+            transition-duration: .3s;
+        }
+
+        .logout-btn:hover .logout-sign {
+            width: 30%;
+            transition-duration: .3s;
+            padding-left: 20px;
+        }
+
+        .logout-btn:hover .logout-text {
+            opacity: 1;
+            width: 70%;
+            transition-duration: .3s;
+            padding-right: 10px;
+        }
+
+        .logout-btn:active {
+            transform: translate(2px, 2px);
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .normal-signin {
+            padding: 10px;
+            font-size: 17px;
+            width: 70%;
+            margin-top: 25px;
+            border: 2px solid transparent;
+            border-radius: 5em;
+            background-color: #1b77da;
+            color: #f2f2f2;
+            font-weight: bold;
+            font-family: sans-serif;
+            transition: 0.2s;
+        }
+
+        .normal-signin:hover {
+            font-size: 27px;
+            background-color: transparent;
+            color: #ffffff;
+            border: 2px solid #1b77da;
+            font-weight: bold;
+        }
+
+        .create-account {
+            padding: 10px;
+            font-size: 17px;
+            width: 70%;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            border: 2px solid transparent;
+            border-radius: 5em;
+            background-color: #e8e8e8;
+            color: #1b77da;
+            font-weight: bold;
+            font-family: sans-serif;
+            transition: 0.2s;
+        }
+
+        .create-account:hover {
+            font-size: 27px;
+            background-color: transparent;
+            color: #ffffff;
+            border: 2px solid #1b77da;
+            font-weight: bold;
+        }
+
+        #btn-message {
+            --text-color: #000;
+            --bg-color-sup: #d2d2d2;
+            --bg-color: #f4f4f4;
+            --bg-hover-color: #ffffff;
+            --online-status: #00da00;
+            --font-size: 16px;
+            --btn-transition: all 0.2s ease-out;
+        }
+
+        .button-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font: 400 var(--font-size) Helvetica Neue, sans-serif;
+            box-shadow: 0 0 2.17382px rgba(0,0,0,.049),0 1.75px 6.01034px rgba(0,0,0,.07),0 3.63px 14.4706px rgba(0,0,0,.091),0 22px 48px rgba(0,0,0,.14);
+            background-color: var(--bg-color);
+            border-radius: 68px;
+            cursor: pointer;
+            padding: 6px 10px 6px 6px;
+            width: fit-content;
+            height: 40px;
+            border: 0;
+            overflow: hidden;
+            position: relative;
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover {
+            height: 56px;
+            padding: 8px 20px 8px 8px;
+            background-color: var(--bg-hover-color);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:active {
+            transform: scale(0.99);
+        }
+
+        .content-avatar {
+            width: 30px;
+            height: 30px;
+            margin: 0;
+            transition: var(--btn-transition);
+            position: relative;
+        }
+
+        .button-message:hover .content-avatar {
+            width: 40px;
+            height: 40px;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: var(--bg-color-sup);
+        }
+
+        .user-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .status-user {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            right: 1px;
+            bottom: 1px;
+            border-radius: 50%;
+            outline: solid 2px var(--bg-color);
+            background-color: var(--online-status);
+            transition: var(--btn-transition);
+            animation: active-status 2s ease-in-out infinite;
+        }
+
+        .button-message:hover .status-user {
+            width: 10px;
+            height: 10px;
+            right: 1px;
+            bottom: 1px;
+            outline: solid 3px var(--bg-hover-color);
+        }
+
+        .notice-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            padding-left: 8px;
+            text-align: initial;
+            color: var(--text-color);
+        }
+
+        .username {
+            letter-spacing: -6px;
+            height: 0;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: var(--btn-transition);
+        }
+
+        .user-id {
+            font-size: 12px;
+            letter-spacing: -6px;
+            height: 0;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--btn-transition);
+        }
+
+        .lable-message {
+            display: flex;
+            align-items: center;
+            opacity: 1;
+            transform: scaleY(1);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover .username {
+            height: auto;
+            letter-spacing: normal;
+            opacity: 1;
+            transform: translateY(0);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover .user-id {
+            height: auto;
+            letter-spacing: normal;
+            opacity: 1;
+            transform: translateY(0);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover .lable-message {
+            height: 0;
+            transform: scaleY(0);
+            transition: var(--btn-transition);
+        }
+
+        .lable-message, .username {
+            font-weight: 600;
+        }
+
+        .number-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-left: 8px;
+            font-size: 12px;
+            width: 16px;
+            height: 16px;
+            background-color: var(--bg-color-sup);
+            border-radius: 20px;
+        }
+
+        /*==============================================*/
+        @keyframes active-status {
+            0% {
+                background-color: var(--online-status);
+            }
+
+            33.33% {
+                background-color: #93e200;
+            }
+
+            66.33% {
+                background-color: #93e200;
+            }
+
+            100% {
+                background-color: var(--online-status);
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="bg-gray-500 text-white">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <!-- Logo và tên trang -->
+            <a class="navbar-brand text-warning" th:href="@{/home}">Note Myself</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <!-- Liên kết đến trang chủ -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/note/list}">Danh sách ghi chú của tôi</a>
+                    </li>
+                    <!-- Liên kết đến trang giới thiệu -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/note/what-is-note-myself}">What is note myself ?</a>
+                    </li>
+                    <!-- Marquee text -->
+                    <li class="nav-item marquee" style="position: absolute; top: 16px; left: 573px; width: 582px">
+                        <span>Thông báo: Note Myself là một ứng dụng ghi chú mạnh mẽ cho phép bạn tổ chức và quản lý các ghi chú của mình một cách hiệu quả. Với Note Myself, bạn có thể tạo, chỉnh sửa và phân loại các ghi chú của mình, đảm bảo rằng tất cả thông tin quan trọng của bạn sẽ dễ dàng truy cập mỗi khi bạn cần. Cho dù bạn là sinh viên, chuyên gia hay bất kỳ ai khác, Note Myself đều có thể giúp bạn duy trì sự tổ chức và hiệu quả làm việc. Nói tạm biệt với các tờ ghi chú dính rải rác và chào đón một trải nghiệm ghi chú được tối ưu hóa với Note Myself. Bắt đầu ngay hôm nay và kiểm soát các ghi chú của bạn với Note Myself.</span>
+                    </li>
+                </ul>
+            </div>
+            <!-- Phần "Xin chào" và nút đăng xuất -->
+            <div class="d-flex justify-content-between align-items-center ml-auto"
+                 th:if="${#authorization.expression('isAuthenticated()')}">
+                <!-- Xin chào -->
+                <button id="btn-message" class="button-message" style="right: 10px" onclick="window.location.href='/user/information'">
+                    <div class="content-avatar">
+                        <div class="status-user"></div>
+                        <div class="avatar">
+                            <div th:if="${user.avatar != null}">
+                                <img th:src="@{${user.avatar}}" alt="Avatar" class="user-img" />
+                            </div>
+                            <div th:if="${user.avatar == null}">
+                                <svg class="user-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path d="M12,12.5c-3.04,0-5.5,1.73-5.5,3.5s2.46,3.5,5.5,3.5,5.5-1.73,5.5-3.5-2.46-3.5-5.5-3.5Zm0-.5c1.66,0,3-1.34,3-3s-1.34-3-3-3-3,1.34-3,3,1.34,3,3,3Z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notice-content">
+                        <div class="username">Xin chào</div>
+                        <div class="lable-message"><span th:text="${fullName}">fullname</span><span class="number-message">0</span></div>
+                        <div class="user-id">@<span th:text="${fullName}">fullname</span></div>
+                    </div>
+                </button>
+                <!-- Nút đăng xuất -->
+                <div id="authLinks">
+                    <div th:if="${#authorization.expression('isAuthenticated()')}">
+                        <form id="logoutForm" th:action="@{/logout}" method="post" onsubmit="handleLogout(event)"
+                              style="display: inline;">
+                            <button type="submit" class="logout-btn">
+                                <div class="logout-sign">
+                                    <svg viewBox="0 0 512 512">
+                                        <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path>
+                                    </svg>
+                                </div>
+                                <div class="logout-text">Logout</div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+<!-- End header -->
+
+<!-- HOME -->
+<section id="home">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="home-info">
+                    <h1>Nơi lưu trữ mọi ghi nhớ của bạn <br>Đây là nơi bạn có thể tạo và quản lý các ghi chú của mình.
+                    </h1>
+                    <!-- You can change the date time in init.js file -->
+                    <h1>Clock</h1>
+                    <div id="countdown">
+                        <ul class="countdown">
+                            <li>
+                                <span id="hours"></span>
+                                <h3>Hours</h3>
+                            </li>
+                            <li>
+                                <span id="minutes"></span>
+                                <h3>Minutes</h3>
+                            </li>
+                            <li>
+                                <span id="seconds"></span>
+                                <h3>Seconds</h3>
+                            </li>
+                        </ul>
+                    </div>
+                    <div role="group" aria-label="Basic example"
+                         th:unless="${#authorization.expression('isAuthenticated()')}"
+                         style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px 0;">
+                        <!-- Nút đăng nhập -->
+                        <form th:action="@{/auth/login}" method="get">
+                            <button type="submit" class="normal-signin" style="width: 250px; margin-bottom: 10px;">Đăng
+                                nhập
+                            </button>
+                        </form>
+                        <!-- Nút đăng ký -->
+                        <form th:action="@{/auth/register/create}" method="get">
+                            <button type="submit" class="create-account" style="width: 250px; margin-top: 10px;">Đăng
+                                ký
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- SCRIPTS -->
+<script src="/js1/jquery.js"></script>
+<script src="/js1/bootstrap.min.js"></script>
+<script src="/js1/vegas.min.js"></script>
+<script src="/js1/countdown.js"></script>
+<script src="/js1/init.js"></script>
+<script src="/js1/custom.js"></script>
+<script>
+    // Hàm cập nhật thời gian hiện tại
+    function updateClock() {
+        var now = new Date();
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+
+        document.getElementById('hours').textContent = hours;
+        document.getElementById('minutes').textContent = minutes;
+        document.getElementById('seconds').textContent = seconds;
+    }
+
+    // Cập nhật thời gian mỗi giây
+    setInterval(updateClock, 1000);
+
+    // Khởi chạy cập nhật thời gian lần đầu
+    updateClock();
+
+    //đăng xuất
+    function handleLogout(event) {
+        event.preventDefault();
+        var logoutForm = document.getElementById('logoutForm');
+        fetch(logoutForm.action, {
+            method: logoutForm.method,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams(new FormData(logoutForm))
+        }).then(response => {
+            if (response.ok) {
+                // Chuyển hướng về trang login
+                window.location.href = '/auth/login';
+            } else {
+                console.error('Logout failed');
+            }
+        }).catch(error => {
+            console.error('An error occurred:', error);
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <style>
+        body {
+            /*font-family: 'Arial', sans-serif;*/
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #343a40;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            z-index: 1000;
+        }
+
+        .header .greeting {
+            display: flex;
+            align-items: center;
+        }
+
+        .header .greeting img {
+            width: 1.5em;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .header .controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .header .controls button {
+            margin-left: 10px;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 58px;
+            left: 0;
+            background-color: #343a40;
+            padding-top: 20px;
+            overflow-y: auto;
+            transition: width 0.3s, background-color 0.3s;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar h5 {
+            padding: 15px;
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .sidebar a {
+            padding: 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            cursor: pointer;
+        }
+
+        .sidebar a::before {
+            content: '• ';
+            color: white;
+        }
+
+        .sidebar a:hover {
+            background-color: #bbbbbb;
+        }
+
+        .sidebar .sidebar-toggle {
+            position: absolute;
+            top: 50%;
+            left: 250px;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background-color: #343a40;
+            color: white;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .sidebar.collapsed .sidebar-toggle {
+            left: 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 80px 20px 20px 20px;
+            transition: margin-left 0.3s;
+        }
+
+        .main-content.collapsed {
+            margin-left: 0;
+        }
+
+        .widget {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            display: none;
+        }
+
+        .widget.active {
+            border-color: #007bff;
+            display: block;
+        }
+
+        .breadcrumb {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Dark mode styles */
+        .dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .sidebar {
+            background-color: #1a1a1a;
+        }
+
+        .dark-mode .widget,
+        .dark-mode .breadcrumb {
+            background-color: #333;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .sidebar a {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .sidebar a:hover {
+            background-color: #444;
+        }
+
+        .dark-mode .sidebar-toggle {
+            background-color: #1a1a1a;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .sidebar-section-content {
+            display: none;
+            padding-left: 15px;
+        }
+
+        .sidebar-section-content a {
+            font-size: 16px;
+        }
+        .language-icon {
+            width: 20px;
+            height: 20px;
+        }
+        .logout-btn {
+            --black: #000000;
+            --ch-black: #141414;
+            --eer-black: #1b1b1b;
+            --night-rider: #2e2e2e;
+            --white: #ffffff;
+            --af-white: #f3f3f3;
+            --ch-white: #e1e1e1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition-duration: .3s;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+            background-color: var(--night-rider);
+        }
+
+        .logout-sign {
+            width: 100%;
+            transition-duration: .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logout-sign svg {
+            width: 17px;
+        }
+
+        .logout-sign svg path {
+            fill: var(--af-white);
+        }
+
+        .logout-text {
+            position: absolute;
+            right: 0%;
+            width: 0%;
+            opacity: 0;
+            color: var(--af-white);
+            font-size: 1.2em;
+            font-weight: 600;
+            transition-duration: .3s;
+        }
+
+        .logout-btn:hover {
+            width: 125px;
+            border-radius: 5px;
+            transition-duration: .3s;
+        }
+
+        .logout-btn:hover .logout-sign {
+            width: 30%;
+            transition-duration: .3s;
+            padding-left: 20px;
+        }
+
+        .logout-btn:hover .logout-text {
+            opacity: 1;
+            width: 70%;
+            transition-duration: .3s;
+            padding-right: 10px;
+        }
+
+        .logout-btn:active {
+            transform: translate(2px, 2px);
+        }
+        .theme-switch {
+            --toggle-size: 15px;
+            /* the size is adjusted using font-size,
+               this is not transform scale,
+               so you can choose any size */
+            --container-width: 5.625em;
+            --container-height: 2.5em;
+            --container-radius: 6.25em;
+            /* radius 0 - minecraft mode :) */
+            --container-light-bg: #3D7EAE;
+            --container-night-bg: #1D1F2C;
+            --circle-container-diameter: 3.375em;
+            --sun-moon-diameter: 2.125em;
+            --sun-bg: #ECCA2F;
+            --moon-bg: #C4C9D1;
+            --spot-color: #959DB1;
+            --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
+            --stars-color: #fff;
+            --clouds-color: #F3FDFF;
+            --back-clouds-color: #AACADF;
+            --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
+        }
+
+        .theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-size: var(--toggle-size);
+        }
+
+        .theme-switch__container {
+            width: var(--container-width);
+            height: var(--container-height);
+            background-color: var(--container-light-bg);
+            border-radius: var(--container-radius);
+            overflow: hidden;
+            cursor: pointer;
+            -webkit-box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+            box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__container::before {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            inset: 0;
+            -webkit-box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+            box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+            border-radius: var(--container-radius)
+        }
+
+        .theme-switch__checkbox {
+            display: none;
+        }
+
+        .theme-switch__circle-container {
+            width: var(--circle-container-diameter);
+            height: var(--circle-container-diameter);
+            background-color: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            left: var(--circle-container-offset);
+            top: var(--circle-container-offset);
+            border-radius: var(--container-radius);
+            -webkit-box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-transition: var(--circle-transition);
+            -o-transition: var(--circle-transition);
+            transition: var(--circle-transition);
+            pointer-events: none;
+        }
+
+        .theme-switch__sun-moon-container {
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+            width: var(--sun-moon-diameter);
+            height: var(--sun-moon-diameter);
+            margin: auto;
+            border-radius: var(--container-radius);
+            background-color: var(--sun-bg);
+            -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+            box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+            -webkit-filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+            filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+            overflow: hidden;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+        }
+
+        .theme-switch__moon {
+            -webkit-transform: translateX(100%);
+            -ms-transform: translateX(100%);
+            transform: translateX(100%);
+            width: 100%;
+            height: 100%;
+            background-color: var(--moon-bg);
+            border-radius: inherit;
+            -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+            box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-switch__spot {
+            position: absolute;
+            top: 0.75em;
+            left: 0.312em;
+            width: 0.75em;
+            height: 0.75em;
+            border-radius: var(--container-radius);
+            background-color: var(--spot-color);
+            -webkit-box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+            box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+        }
+
+        .theme-switch__spot:nth-of-type(2) {
+            width: 0.375em;
+            height: 0.375em;
+            top: 0.937em;
+            left: 1.375em;
+        }
+
+        .theme-switch__spot:nth-last-of-type(3) {
+            width: 0.25em;
+            height: 0.25em;
+            top: 0.312em;
+            left: 0.812em;
+        }
+
+        .theme-switch__clouds {
+            width: 1.25em;
+            height: 1.25em;
+            background-color: var(--clouds-color);
+            border-radius: var(--container-radius);
+            position: absolute;
+            bottom: -0.625em;
+            left: 0.312em;
+            -webkit-box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+            box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+            -webkit-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            -o-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+            transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+        }
+
+        .theme-switch__stars-container {
+            position: absolute;
+            color: var(--stars-color);
+            top: -100%;
+            left: 0.312em;
+            width: 2.75em;
+            height: auto;
+            -webkit-transition: var(--transition);
+            -o-transition: var(--transition);
+            transition: var(--transition);
+        }
+
+        /* actions */
+
+        .theme-switch__checkbox:checked + .theme-switch__container {
+            background-color: var(--container-night-bg);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container:hover {
+            left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - 0.187em)
+        }
+
+        .theme-switch__circle-container:hover {
+            left: calc(var(--circle-container-offset) + 0.187em);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
+            -webkit-transform: translate(0);
+            -ms-transform: translate(0);
+            transform: translate(0);
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+            bottom: -4.062em;
+        }
+
+        .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+            top: 50%;
+            -webkit-transform: translateY(-50%);
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+        #languageToggleBtn {
+            background-color: transparent;
+            border: none;
+            padding: 0;
+            margin-right: 10px;
+            outline: none;
+            box-shadow: none;
+        }
+
+        #languageToggleBtn img {
+            width: 29px;
+            height: auto;
+        }
+
+        .dark-mode .sidebar {
+            background-color: #1a1a1a;
+        }
+
+        .dark-mode .widget,
+        .dark-mode .breadcrumb {
+            background-color: #333;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .sidebar a {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .sidebar a:hover {
+            background-color: #444;
+        }
+
+        .dark-mode .sidebar-toggle {
+            background-color: #1a1a1a;
+        }
+
+        .dark-mode .table {
+            background-color: #333;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .table th, .dark-mode .table td {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .thead-dark th {
+            color: #e0e0e0;
+            background-color: #444;
+            border-color: #828282
+        }
+        @keyframes wave {
+            0% { transform: rotate(0deg); }
+            10% { transform: rotate(14deg); }
+            20% { transform: rotate(-8deg); }
+            30% { transform: rotate(14deg); }
+            40% { transform: rotate(-4deg); }
+            50% { transform: rotate(10deg); }
+            60% { transform: rotate(0deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        #waving-hand {
+            display: inline-block;
+            animation: wave 2s infinite;
+            transform-origin: 70% 70%;
+            width: 1.5em;
+            vertical-align: middle;
+        }
+        .table img {
+            border-radius: 20%;
+            max-width: 50px;
+            max-height: 50px;
+        }
+        /* Áp dụng cho bảng trong chế độ sáng */
+        .table {
+            --bs-table-bg: #ffffff;
+            --bs-table-striped-bg: transparent;
+            --bs-table-striped-color: inherit;
+        }
+
+        /* Áp dụng cho bảng trong chế độ tối */
+        .dark-mode .table {
+            --bs-table-bg: #333333;
+            --bs-table-color: #e0e0e0;
+            --bs-table-border-color: #828282;
+            --bs-table-striped-bg: no;
+            --bs-table-striped-color: inherit;
+        }
+
+        /* Đảm bảo thead trong chế độ tối cũng được áp dụng màu đúng */
+        .dark-mode .table .thead-dark th {
+            background-color: #444444;
+            color: #e0e0e0;
+        }
+        .modal-backdrop {
+            display: none !important;
+            z-index: 1040 !important;
+        }
+        .custom-modal-dialog {
+            max-width: 80%;
+        }
+        /* Tùy chỉnh kích thước của ảnh */
+        .custom-modal-body img {
+            width: 100%;
+            height: auto;
+        }
+        /* Tùy chỉnh nội dung của modal */
+        .custom-modal-content {
+            margin-top: 53px;
+            padding: 20px;
+            width: 40%;
+        }
+        .modal {
+            z-index: 1050 !important;
+        }
+        /* Styles for light mode */
+        .pagination .page-link {
+            background-color: white;
+            color: black;
+        }
+        .pagination .page-link:hover {
+            background-color: #f0f0f0;
+            color: black;
+        }
+        /* Styles for dark mode */
+        .dark-mode .pagination .page-link {
+            background-color: #6a7179;
+            color: white;
+        }
+        .dark-mode .pagination .page-link:hover {
+            background-color: #444;
+            color: white;
+        }
+        .dark-mode .pagination .active > .page-link,
+        .dark-mode .page-link.active {
+            border-color: black;
+            border-width: 2px;
+        }
+        .btn-outline-danger {
+            --bs-btn-border-color: rgb(106, 113, 121);
+            --bs-btn-color: rgb(106, 113, 121);
+        }
+
+        .btn-outline-danger:hover {
+            --bs-btn-border-color: rgb(220, 53, 69);
+            --bs-btn-color: rgba(220, 53, 69, 0.7);
+        }
+        .btn-check:checked + .btn,
+        .btn.active,
+        .btn.show,
+        .btn:first-child:active,
+        :not(.btn-check) + .btn:active {
+            background-color: rgb(106, 113, 121);
+            color: #ffffff;
+            border-color: rgb(106, 113, 121);
+        }
+        .dark-mode .btn-outline-danger {
+            --bs-btn-border-color: #B5B5B5;
+            --bs-btn-color: #B5B5B5;
+        }
+
+        .dark-mode .btn-outline-danger:hover {
+            --bs-btn-border-color: rgb(255, 184, 192);
+            --bs-btn-color: rgb(255, 184, 192);
+        }
+
+        .dark-mode .btn-check:checked + .btn,
+        .dark-mode .btn.active,
+        .dark-mode .btn.show,
+        .dark-mode .btn:first-child:active,
+        .dark-mode :not(.btn-check) + .btn:active {
+            background-color: #5B6369;
+            color: #ffffff;
+            border-color: #5B6369;
+        }
+        .light-mode .modal-content {
+            background-color: white;
+            color: black;
+        }
+        .dark-mode .modal-content {
+            background-color: #333;
+            color: white;
+        }
+        .dark-mode .btn-close {
+            filter: invert(1);
+        }
+        .notification {
+            position: fixed;
+            top: 125px;
+            right: 34px;
+            z-index: 1000;
+            padding: 10px;
+            border-radius: 30px;
+            opacity: 0;
+            transition: opacity 1s linear;
+            animation: fadeInOut 10s;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="header">
+    <div class="greeting">
+        <span style="font-weight: bold">Hello <span th:text="${adminInfo.fullName}"></span></span>
+        <img id="waving-hand" src="https://emojigraph.org/media/facebook/waving-hand_1f44b.png" alt="Waving Hand" style="padding-bottom: 5px;">
+    </div>
+    <div class="controls">
+        <button id="languageToggleBtn" class="btn btn-secondary" onclick="toggleLanguage()" style="margin-right: 10px;">
+            <img id="languageToggleImage" src="images/english.png" alt="Switch to English" class="language-icon">
+        </button>
+        <label class="theme-switch">
+            <input type="checkbox" class="theme-switch__checkbox" onclick="toggleDarkMode()">
+            <div class="theme-switch__container">
+                <div class="theme-switch__clouds"></div>
+                <div class="theme-switch__stars-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z" fill="currentColor"></path>
+                    </svg>
+                </div>
+                <div class="theme-switch__circle-container">
+                    <div class="theme-switch__sun-moon-container">
+                        <div class="theme-switch__moon">
+                            <div class="theme-switch__spot"></div>
+                            <div class="theme-switch__spot"></div>
+                            <div class="theme-switch__spot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </label>
+        <button class="btn btn-secondary" onclick="goHome()">Trang chủ</button>
+        <!-- Nút đăng xuất -->
+        <div id="authLinks">
+            <div th:if="${#authorization.expression('isAuthenticated()')}">
+                <form id="logoutForm" th:action="@{/logout}" method="post" onsubmit="handleLogout(event)"
+                      style="display: inline;">
+                    <button type="submit" class="logout-btn">
+                        <div class="logout-sign">
+                            <svg viewBox="0 0 512 512">
+                                <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path>
+                            </svg>
+                        </div>
+                        <div class="logout-text">Logout</div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sidebar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    <div class="sidebar-section">
+        <h5 data-en="Admin Dashboard" data-vi="Bảng điều khiển" onclick="toggleSection(this)">+ Bảng điều khiển</h5>
+        <div class="sidebar-section-content">
+            <!-- Nút Danh sánh tài khoản -->
+            <a href="/admin" data-en="List of accounts" data-vi="Danh sách tài khoản" onclick="activateWidget('dashboard')">Danh sách tài khoản</a>
+            <!-- Nút Danh sánh nhóm -->
+            <a href="#viewGroups" data-en="List of Groups" data-vi="Danh sách nhóm" onclick="activateWidget('viewGroups')">Xem danh sách nhóm</a>
+        </div>
+    </div>
+    <div class="sidebar-section">
+        <h5 data-en="Notifications" data-vi="Thông báo" onclick="toggleSection(this)">+ Thông báo</h5>
+        <div class="sidebar-section-content">
+            <!-- Nút Hệ thống thông báo -->
+            <a href="#systemNotifications" data-en="System Notifications" data-vi="Hệ thống thông báo" onclick="activateWidget('systemNotifications')">Hệ thống thông báo</a>
+            <!-- Nút Gửi email thông báo -->
+            <a href="#sendEmailNotificationsCustom" data-en="Send Custom Email Notifications" data-vi="Gửi email tùy chỉnh" onclick="activateWidget('sendEmailNotificationsCustom')">Gửi email tùy chỉnh</a>
+            <!-- Nút Gửi email thông báo toàn bộ-->
+            <a href="#sendEmailNotificationsAll" data-en="Send Email Notifications All" data-vi="Gửi email thông báo tất cả" onclick="activateWidget('sendEmailNotificationsAll')">Gửi email thông báo tất cả</a>
+        </div>
+    </div>
+    <!--nút kéo mở đóng slidebar-->
+    <button class="sidebar-toggle collapsed" onclick="toggleSidebar()">→</button>
+</div>
+
+<div class="main-content">
+    <!-- Thông báo -->
+    <div th:if="${message}" th:classappend="${alertClass}" class="notification" id="notification">
+        <span th:text="${message}"></span>
+    </div>
+    <!--Admin Dashboard User-->
+    <div id="Bảng điều khiển" class="widget active">
+        <h3 data-en="List of accounts" data-vi="Danh sách tài khoản">Danh sách tài khoản</h3>
+        <p data-en="Welcome to the admin dashboard!" data-vi="Chào mừng đến với bảng điều khiển quản trị!">
+            Chào mừng đến với bảng điều khiển quản trị!
+        </p>
+        <p style="font-size: 1.5em; font-weight: bold">
+            Hello <span th:text="${adminInfo.firstName}"></span>
+            <img id="waving-hand" src="https://emojigraph.org/media/facebook/waving-hand_1f44b.png" alt="Waving Hand" style="padding-bottom: 15px;">
+        </p>
+        <h4 data-en="List of user accounts in the system" data-vi="Danh sách các tài khoản trong hệ thống">Danh sách các tài khoản trong hệ thống</h4>
+
+        <!-- Form tìm kiếm -->
+        <form onsubmit="handleSearch(event)" class="row mb-3">
+            <div class="col-md-10 ml-0 mb-2 mt-2">
+                <div class="input-group">
+                    <select id="searchType" name="searchType" class="form-select" style="max-width: 150px;">
+                        <option value="id">ID</option>
+                        <option value="username">Tên tài khoản</option>
+                        <option value="fullName">Họ tên</option>
+                        <option value="email">Email</option>
+                    </select>
+                    <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Keyword" required style="max-width: 250px;">
+                    <button type="submit" class="btn btn-outline-info" style="margin-left: 0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.415l-3.85-3.85zm-5.44-9.733a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Nút lọc -->
+        <div class="mb-3">
+            <div class="btn-group" role="group" aria-label="Filter Options">
+                <button type="button" class="btn btn-outline-danger" id="filterAll" onclick="showAll()" data-en="All" data-vi="Tất cả">Tất cả</button>
+
+                <input type="checkbox" class="btn-check" id="filterGenderMale" value="Male" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filterGenderMale" data-en="Male" data-vi="Nam">Nam</label>
+
+                <input type="checkbox" class="btn-check" id="filterGenderFemale" value="Female" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filterGenderFemale" data-en="Female" data-vi="Nữ">Nữ</label>
+
+                <input type="checkbox" class="btn-check" id="filterGenderOther" value="Other" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filterGenderOther" data-en="Other" data-vi="Khác">Khác</label>
+
+                <input type="checkbox" class="btn-check" id="filterRoleAdmin" value="Admin" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filterRoleAdmin" data-en="Admin" data-vi="Admin">Admin</label>
+
+                <input type="checkbox" class="btn-check" id="filterRoleManager" value="Manager" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filterRoleManager" data-en="Manager" data-vi="Manager">Manager</label>
+
+                <input type="checkbox" class="btn-check" id="filterRoleMember" value="Member" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filterRoleMember" data-en="Member" data-vi="Member">Member</label>
+
+                <input type="checkbox" class="btn-check" id="filterRoleVIPMember" value="VIP Member" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filterRoleVIPMember" data-en="VIP Member" data-vi="VIP Member">VIP Member</label>
+
+                <input type="checkbox" class="btn-check" id="filterActiveYes" value="✓" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filterActiveYes" data-en="Active ✓" data-vi="Hoạt động ✓">Hoạt động ✓</label>
+
+                <input type="checkbox" class="btn-check" id="filterActiveNo" value="✗" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filterActiveNo" data-en="Inactive ✗" data-vi="Hoạt động ✗">Hoạt động ✗</label>
+
+                <input type="checkbox" class="btn-check" id="filter2FAYes" value="✓" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filter2FAYes" data-en="2FA ✓" data-vi="2FA ✓">2FA ✓</label>
+
+                <input type="checkbox" class="btn-check" id="filter2FANo" value="✗" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filter2FANo" data-en="2FA ✗" data-vi="2FA ✗">2FA ✗</label>
+
+                <input type="checkbox" class="btn-check" id="filterAvatarYes" value="✓" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filterAvatarYes" data-en="Avatar ✓" data-vi="Ảnh ✓">Ảnh ✓</label>
+
+                <input type="checkbox" class="btn-check" id="filterAvatarNo" value="✗" autocomplete="off" onchange="applyFilters()">
+                <label class="btn btn-outline-danger" for="filterAvatarNo" data-en="Avatar ✗" data-vi="Ảnh ✗">Ảnh ✗</label>
+            </div>
+        </div>
+
+        <!-- Các nút sắp xếp -->
+        <div class="mb-3">
+            <div class="btn-group" role="group" aria-label="Sort Options">
+                <button type="button" class="btn btn-secondary" data-en="ID ↑" data-vi="ID ↑" onclick="sortTable(0, 'asc')" style="border: 1px solid #b5b5b5;">ID ↑</button>
+                <button type="button" class="btn btn-secondary" data-en="ID ↓" data-vi="ID ↓" onclick="sortTable(0, 'desc')" style="border: 1px solid #b5b5b5;">ID ↓</button>
+                <button type="button" class="btn btn-secondary" data-en="Name A-Z" data-vi="Tên A-Z" onclick="sortTableByLastName('asc')" style="border: 1px solid #b5b5b5;">Tên A-Z</button>
+                <button type="button" class="btn btn-secondary" data-en="Name Z-A" data-vi="Tên Z-A" onclick="sortTableByLastName('desc')" style="border: 1px solid #b5b5b5;">Tên Z-A</button>
+                <button type="button" class="btn btn-secondary" data-en="Newest Registration" data-vi="Đăng ký gần nhất" onclick="sortTableByRegistrationTime('asc')" style="border: 1px solid #b5b5b5;">Đăng ký gần nhất</button>
+                <button type="button" class="btn btn-secondary" data-en="Oldest Registration" data-vi="Đăng ký lâu nhất" onclick="sortTableByRegistrationTime('desc')" style="border: 1px solid #b5b5b5;">Đăng ký lâu nhất</button>
+            </div>
+        </div>
+
+        <!-- Nút tùy chỉnh cột -->
+        <button type="button" class="btn btn-outline-dark mb-3" onclick="openColumnSettings()" data-en="Column Settings" data-vi="Tùy chỉnh cột">Tùy chỉnh cột</button>
+
+        <!-- Nút Thống kê tài khoản -->
+        <button type="button" class="btn btn-outline-info mb-3" data-bs-toggle="modal" data-bs-target="#accountStatisticsModal" onclick="calculateStatistics()" data-en="Account Statistics" data-vi="Thống kê tài khoản">
+            Thống kê tài khoản
+        </button>
+
+        <!-- Nút Xuất ra file Excel -->
+        <button type="button" class="btn btn-outline-success mb-3" data-bs-toggle="modal" data-bs-target="#exportExcelModal" data-en="Export to Excel" data-vi="Xuất ra Excel">
+            Xuất ra Excel
+        </button>
+
+        <!--bảng-->
+        <table class="table table-bordered table-hover table-striped">
+            <thead class="thead-dark">
+            <tr>
+                <th data-en="ID" data-vi="ID">ID</th>
+                <th data-en="Username" data-vi="Tên tài khoản">Tên tài khoản</th>
+                <th data-en="Full Name" data-vi="Họ tên">Họ tên</th>
+                <th data-en="Email" data-vi="Email">Email</th>
+                <th data-en="Gender" data-vi="Giới tính">Giới tính</th>
+                <th data-en="Role" data-vi="Vai trò">Vai trò</th>
+                <th data-en="Active" data-vi="Hoạt động">Hoạt động</th>
+                <th data-en="Registration Time" data-vi="Thời gian đăng ký">Thời gian đăng ký</th>
+                <th data-en="2FA" data-vi="2FA">TOTP Secret</th>
+                <th data-en="Avatar" data-vi="Ảnh">Avatar</th>
+                <th data-en="Actions" data-vi="Hành động">Hành động</th>
+            </tr>
+            </thead>
+            <tbody id="userTableBody">
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}" data-column="id" style="text-align: center; vertical-align: middle;">ID</td>
+                <td th:text="${user.username}" data-column="username" style="text-align: left; vertical-align: middle;">Tên tài khoản</td>
+                <td th:text="${user.fullName}" data-column="fullName" style="text-align: left; vertical-align: middle;">Họ tên</td>
+                <td th:text="${user.email}" data-column="email" style="text-align: left; vertical-align: middle;">Email</td>
+                <td th:text="${user.title}" data-column="gender" style="text-align: center; vertical-align: middle;">Giới tính</td>
+                <td th:text="${user.role}" data-column="role" style="text-align: center; vertical-align: middle;">Vai trò</td>
+                <td th:utext="${user.active}" data-column="active" style="text-align: center; vertical-align: middle;">Hoạt động</td>
+                <td th:text="${user.registrationTime}" data-column="registrationTime" style="text-align: center; vertical-align: middle;">Thời gian đăng ký</td>
+                <td th:utext="${user.totpStatus}" data-column="2fa" style="text-align: center; vertical-align: middle;">TOTP Secret</td>
+                <td data-column="avatar" style="text-align: center; vertical-align: middle;">
+                    <a th:if="${user.avatar}" href="javascript:void(0);" th:onclick="'showImageModal(\'' + @{${user.avatar}} + '\')'">
+                        <img th:src="${user.avatar}" alt="Avatar" style="width: auto; height: 50px;">
+                    </a>
+                    <span th:if="${user.avatar == null}" style="color: red;">✗</span>
+                </td>
+                <td style="text-align: center; vertical-align: middle;">
+                    <div style="display: flex; gap: 2mm;">
+                        <a class="btn btn-outline-info" th:href="@{'/admin/edit/' + ${user.id}}" data-en="Edit" data-vi="Sửa">Sửa</a>
+                        <form th:action="@{'/admin/delete/' + ${user.id}}" method="post" th:onsubmit="return confirm('Are you sure you want to delete this user?\nBạn có chắc chắn muốn xóa người dùng này?');">
+                            <button type="submit" class="btn btn-outline-danger" data-en="Delete" data-vi="Xóa">Xóa</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Phân trang -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" id="prevPage">
+                    <a class="page-link" href="javascript:void(0);" onclick="prevPage()" data-en="Previous" data-vi="Trước">Previous</a>
+                </li>
+                <li class="page-item" id="nextPage">
+                    <a class="page-link" href="javascript:void(0);" onclick="nextPage()" data-en="Next" data-vi="Tiếp">Next</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Modal tùy chỉnh cột-->
+        <div class="modal fade no-backdrop" id="columnSettingsModal" tabindex="-1" aria-labelledby="columnSettingsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content light-mode">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="columnSettingsModalLabel" data-en="Column Settings" data-vi="Tùy chỉnh cột">Tùy chỉnh cột</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="0" id="columnCheckbox0" checked>
+                            <label class="form-check-label" for="columnCheckbox0" data-en="ID" data-vi="ID">ID</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="1" id="columnCheckbox1" checked>
+                            <label class="form-check-label" for="columnCheckbox1" data-en="Username" data-vi="Tên tài khoản">Tên tài khoản</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="2" id="columnCheckbox2" checked>
+                            <label class="form-check-label" for="columnCheckbox2" data-en="Full Name" data-vi="Họ tên">Họ tên</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="3" id="columnCheckbox3" checked>
+                            <label class="form-check-label" for="columnCheckbox3" data-en="Email" data-vi="Email">Email</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="4" id="columnCheckbox4" checked>
+                            <label class="form-check-label" for="columnCheckbox4" data-en="Gender" data-vi="Giới tính">Giới tính</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="5" id="columnCheckbox5" checked>
+                            <label class="form-check-label" for="columnCheckbox5" data-en="Role" data-vi="Vai trò">Vai trò</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="6" id="columnCheckbox6" checked>
+                            <label class="form-check-label" for="columnCheckbox6" data-en="Active" data-vi="Hoạt động">Hoạt động</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="7" id="columnCheckbox7" checked>
+                            <label class="form-check-label" for="columnCheckbox7" data-en="Registration Time" data-vi="Thời gian đăng ký">Thời gian đăng ký</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="8" id="columnCheckbox8" checked>
+                            <label class="form-check-label" for="columnCheckbox8" data-en="2FA" data-vi="2FA">2FA</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="9" id="columnCheckbox9" checked>
+                            <label class="form-check-label" for="columnCheckbox9" data-en="Avatar" data-vi="Ảnh">Ảnh</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="10" id="columnCheckbox10" checked>
+                            <label class="form-check-label" for="columnCheckbox10" data-en="Action" data-vi="Hành động">Hành động</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="applyColumnSettings()" data-en="Save changes" data-vi="Lưu thay đổi" style="color: white;">Lưu thay đổi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal tìm kiếm -->
+        <div class="modal fade" id="searchResultsModal" tabindex="-1" aria-labelledby="searchResultsModalLabel" aria-hidden="true">
+            <div class="modal-dialog custom-modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="width: 100%; max-width: 1000px;">
+                    <div class="modal-header">
+                        <h4 class="modal-title w-100 text-center" id="searchResultsModalLabel" data-en="Search Results" data-vi="Kết quả tìm kiếm" style="font-weight: bold;">Kết quả tìm kiếm</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="searchResults">
+                            <table style="width: 100%; table-layout: auto;">
+                                <thead>
+                                <tr>
+                                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;" data-en="ID" data-vi="ID">ID</th>
+                                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;" data-en="Username" data-vi="Tên tài khoản">Tên tài khoản</th>
+                                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;" data-en="Full Name" data-vi="Họ tên">Họ tên</th>
+                                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;" data-en="Email" data-vi="Email">Email</th>
+                                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;" data-en="Details" data-vi="Chi tiết">Chi tiết</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Dữ liệu tìm kiếm sẽ được thêm vào đây -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal hiển thị chi tiết người dùng -->
+        <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog custom-modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title w-100 text-center" id="userDetailsModalLabel" data-en="User Details" data-vi="Chi tiết người dùng" style="font-weight: bold;">Chi tiết người dùng</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body custom-modal-body" id="userDetailsBody">
+                        <p>ID: <span id="userId"></span></p>
+                        <p data-en="Username" data-vi="Tên tài khoản">Tên tài khoản: <span id="userUsername"></span></p>
+                        <p data-en="Full Name" data-vi="Họ tên">Họ tên: <span id="userFullName"></span></p>
+                        <p data-en="Email" data-vi="Email">Email: <span id="userEmail"></span></p>
+                        <p data-en="Gender" data-vi="Giới tính">Giới tính: <span id="userGender"></span></p>
+                        <p data-en="Role" data-vi="Vai trò">Vai trò: <span id="userRole"></span></p>
+                        <p data-en="Active" data-vi="Hoạt động">Hoạt động: <span id="userActive"></span></p>
+                        <p data-en="Registration Time" data-vi="Thời gian đăng ký">Thời gian đăng ký: <span id="userRegistrationTime"></span></p>
+                        <p data-en="2FA" data-vi="2FA">2FA: <span id="userTotpStatus"></span></p>
+                        <p data-en="Avatar" data-vi="Ảnh">Ảnh: <img id="userAvatar" src="" alt="Avatar" style="width: auto; height: 50px;"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal để hiển thị ảnh -->
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <div class="modal-dialog custom-modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title w-100 text-center" id="imageModalLabel" data-en="View Image" data-vi="Xem ảnh" style="font-weight: bold;">Xem ảnh</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body custom-modal-body">
+                        <img id="modalImage" src="" alt="Avatar" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Thống kê tài khoản -->
+        <div class="modal fade" id="accountStatisticsModal" tabindex="-1" aria-labelledby="accountStatisticsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="accountStatisticsModalLabel" data-en="Account Statistics" data-vi="Thống kê tài khoản">Thống kê tài khoản</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-dark">
+                            <tr>
+                                <th data-en="Category" data-vi="Danh mục">Danh mục</th>
+                                <th data-en="Count" data-vi="Số lượng">Số lượng</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td data-en="All Accounts" data-vi="Tất cả tài khoản">Tất cả tài khoản</td>
+                                <td id="totalAccounts"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="Male" data-vi="Nam">Nam</td>
+                                <td id="totalMale"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="Female" data-vi="Nữ">Nữ</td>
+                                <td id="totalFemale"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="Other" data-vi="Khác">Khác</td>
+                                <td id="totalOther"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="Admin" data-vi="Admin">Admin</td>
+                                <td id="totalAdmin"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="Manager" data-vi="Manager">Manager</td>
+                                <td id="totalManager"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="Member" data-vi="Member">Member</td>
+                                <td id="totalMember"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="VIP Member" data-vi="VIP Member">VIP Member</td>
+                                <td id="totalVIPMember"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="Active" data-vi="Hoạt động">Hoạt động</td>
+                                <td id="totalActive"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="Inactive" data-vi="Không hoạt động">Không hoạt động</td>
+                                <td id="totalInactive"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="2FA Enabled" data-vi="Đã bật 2FA">Đã bật 2FA</td>
+                                <td id="total2FAEnabled"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="2FA Disabled" data-vi="Chưa bật 2FA">Chưa bật 2FA</td>
+                                <td id="total2FADisabled"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="Avatar Present" data-vi="Có ảnh đại diện">Có ảnh đại diện</td>
+                                <td id="totalAvatarPresent"></td>
+                            </tr>
+                            <tr>
+                                <td data-en="Avatar Absent" data-vi="Không có ảnh đại diện">Không có ảnh đại diện</td>
+                                <td id="totalAvatarAbsent"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-en="Close" data-vi="Đóng">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Tùy chỉnh các cột cần xuất -->
+        <div class="modal fade" id="exportExcelModal" tabindex="-1" aria-labelledby="exportExcelModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exportExcelModalLabel" data-en="Export to Excel" data-vi="Xuất ra Excel">Xuất ra Excel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="exportForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="exportSpecificId" class="form-label" data-en="Specific ID(s)" data-vi="ID cụ thể">ID cụ thể</label>
+                                        <input type="text" class="form-control" id="exportSpecificId" name="exportSpecificId" placeholder="ID">
+                                        <small class="form-text text-danger" data-en="Note: Enter IDs, separated by commas. Leave empty to export all." data-vi="Lưu ý: Nhập ID, cách nhau bằng dấu phẩy, bỏ trống nếu muốn xuất tất cả">Lưu ý: Nhập ID, cách nhau bằng dấu phẩy, bỏ trống nếu muốn xuất tất cả</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exportGender" class="form-label" data-en="Gender" data-vi="Giới tính">Giới tính</label>
+                                        <select class="form-select" id="exportGender" name="exportGender">
+                                            <option value="" data-en="All" data-vi="Tất cả">Tất cả</option>
+                                            <option value="Male" data-en="Male" data-vi="Nam">Nam</option>
+                                            <option value="Female" data-en="Female" data-vi="Nữ">Nữ</option>
+                                            <option value="Other" data-en="Other" data-vi="Khác">Khác</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exportRole" class="form-label" data-en="Role" data-vi="Vai trò">Vai trò</label>
+                                        <select class="form-select" id="exportRole" name="exportRole">
+                                            <option value="" data-en="All" data-vi="Tất cả">Tất cả</option>
+                                            <option value="Admin" data-en="Admin" data-vi="Admin">Admin</option>
+                                            <option value="Manager" data-en="Manager" data-vi="Manager">Manager</option>
+                                            <option value="Member" data-en="Member" data-vi="Member">Member</option>
+                                            <option value="VIPMember" data-en="VIP Member" data-vi="VIP Member">VIP Member</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exportActive" class="form-label" data-en="Active Status" data-vi="Trạng thái hoạt động">Trạng thái hoạt động</label>
+                                        <select class="form-select" id="exportActive" name="exportActive">
+                                            <option value="" data-en="All" data-vi="Tất cả">Tất cả</option>
+                                            <option value="✓" data-en="Active" data-vi="Hoạt động">Hoạt động</option>
+                                            <option value="✗" data-en="Inactive" data-vi="Không hoạt động">Không hoạt động</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="export2FA" class="form-label" data-en="2FA Status" data-vi="Trạng thái 2FA">Trạng thái 2FA</label>
+                                        <select class="form-select" id="export2FA" name="export2FA">
+                                            <option value="" data-en="All" data-vi="Tất cả">Tất cả</option>
+                                            <option value="✓" data-en="Enabled" data-vi="Đã bật">Đã bật</option>
+                                            <option value="✗" data-en="Disabled" data-vi="Chưa bật">Chưa bật</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exportAvatar" class="form-label" data-en="Avatar Status" data-vi="Trạng thái ảnh đại diện">Trạng thái ảnh đại diện</label>
+                                        <select class="form-select" id="exportAvatar" name="exportAvatar">
+                                            <option value="" data-en="All" data-vi="Tất cả">Tất cả</option>
+                                            <option value="✓" data-en="Present" data-vi="Có ảnh đại diện">Có ảnh đại diện</option>
+                                            <option value="✗" data-en="Absent" data-vi="Không có ảnh đại diện">Không có ảnh đại diện</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="modal-title" data-en="Customize the columns to export" data-vi="Tùy chỉnh cột cần xuất">Tùy chỉnh cột cần xuất</h5>
+                                    <hr>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="id" id="exportId" checked>
+                                        <label class="form-check-label" for="exportId" data-en="ID" data-vi="ID">
+                                            ID
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="username" id="exportUsername" checked>
+                                        <label class="form-check-label" for="exportUsername" data-en="Username" data-vi="Tên tài khoản">
+                                            Tên tài khoản
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="fullName" id="exportFullName" checked>
+                                        <label class="form-check-label" for="exportFullName" data-en="Full Name" data-vi="Họ tên">
+                                            Họ tên
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="email" id="exportEmail" checked>
+                                        <label class="form-check-label" for="exportEmail" data-en="Email" data-vi="Email">
+                                            Email
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="gender" id="exportGenderCheckbox" checked>
+                                        <label class="form-check-label" for="exportGenderCheckbox" data-en="Gender" data-vi="Giới tính">
+                                            Giới tính
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="role" id="exportRoleCheckbox" checked>
+                                        <label class="form-check-label" for="exportRoleCheckbox" data-en="Role" data-vi="Vai trò">
+                                            Vai trò
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="active" id="exportActiveCheckbox" checked>
+                                        <label class="form-check-label" for="exportActiveCheckbox" data-en="Active" data-vi="Hoạt động">
+                                            Hoạt động
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="registrationTime" id="exportRegistrationTime" checked>
+                                        <label class="form-check-label" for="exportRegistrationTime" data-en="Registration Time" data-vi="Thời gian đăng ký">
+                                            Thời gian đăng ký
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="2fa" id="export2faCheckbox" checked>
+                                        <label class="form-check-label" for="export2faCheckbox" data-en="2FA" data-vi="2FA">
+                                            2FA
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="avatar" id="exportAvatarCheckbox" checked>
+                                        <label class="form-check-label" for="exportAvatarCheckbox" data-en="Avatar" data-vi="Ảnh đại diện">
+                                            Ảnh đại diện
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-en="Close" data-vi="Đóng">Đóng</button>
+                        <button type="button" class="btn btn-primary" onclick="exportToExcel()" data-en="Export" data-vi="Xuất">Xuất</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Group Dashboard-->
+    <div id="viewGroups" class="widget">
+        <h3 data-en="List Of Groups" data-vi="Danh sách nhóm">Danh sách nhóm</h3>
+        <p data-en="Logic to list all groups." data-vi="Logic tương tự như danh sách tài khoản">Logic để xem danh sách nhóm.</p>
+    </div>
+
+    <!--Hệ thống thông báo-->
+    <div id="systemNotifications" class="widget">
+        <h3 data-en="System Notifications" data-vi="Hệ thống thông báo">Hệ thống thông báo</h3>
+
+        <div class="container mt-4">
+            <!-- Form thêm thông báo -->
+            <h4 data-en="Add Notification" data-vi="Thêm thông báo">Thêm thông báo</h4>
+            <form id="addNotificationForm" th:action="@{/admin/addNotification}" method="post">
+                <div class="mb-3">
+                    <label for="title" class="form-label" data-en="Title" data-vi="Tiêu đề">Tiêu đề</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="Nhập tiêu đề" required>
+                </div>
+                <div class="mb-3">
+                    <label for="content" class="form-label" data-en="Content" data-vi="Nội dung">Nội dung</label>
+                    <textarea class="form-control" id="content" name="content" rows="5" placeholder="Nhập nội dung thông báo" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" data-en="Submit" data-vi="Gửi">Gửi</button>
+            </form>
+        </div>
+
+        <div class="container mt-4">
+            <!-- Bảng hiển thị thông báo -->
+            <h4 data-en="Notifications" data-vi="Thông báo">Thông báo</h4>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead class="table-dark text-center">
+                    <tr>
+                        <th data-en="Date" data-vi="Ngày">Ngày</th>
+                        <th data-en="Title" data-vi="Tiêu đề">Tiêu đề</th>
+                        <th data-en="Content" data-vi="Nội dung">Nội dung</th>
+                        <th data-en="Actions" data-vi="Hành động">Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${notifications.size() == 0}">
+                        <td colspan="4" class="text-center" data-en="No notifications available." data-vi="Chưa có thông báo nào.">Chưa có thông báo nào.</td>
+                    </tr>
+                    <tr th:each="notification : ${notifications}">
+                        <td class="text-center" th:text="${notification.createdAt}">Ngày thêm</td>
+                        <td th:text="${notification.title.length() < 10 ? notification.title : notification.title.substring(0, 10) + '...'}">Tiêu đề</td>
+                        <td th:text="${notification.content.length() < 70 ? notification.content : notification.content.substring(0, 70) + '...'}">Nội dung</td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#notificationModal"
+                                        th:attr="data-title=${notification.title}, data-content=${notification.content}, data-date=${notification.createdAt}">
+                                    <span data-en="View" data-vi="Xem">Xem</span>
+                                </button>
+                                <form th:action="@{/admin/deleteNotification}" method="post" style="display:inline;">
+                                    <input type="hidden" name="notificationId" th:value="${notification.id}" />
+                                    <button type="submit" class="btn btn-danger btn-sm" data-en="Delete" data-vi="Xóa">Xóa</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationModalLabel" data-en="Notification Details" data-vi="Chi tiết thông báo">Chi tiết thông báo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong data-en="Added Date:" data-vi="Ngày thêm:">Ngày thêm:</strong> <span id="modalDate"></span></p>
+                    <p><strong data-en="Title:" data-vi="Tiêu đề:">Tiêu đề:</strong> <span id="modalTitle"></span></p>
+                    <p><strong data-en="Content:" data-vi="Nội dung:">Nội dung:</strong> <span id="modalContent"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-en="Close" data-vi="Đóng">Đóng</button>
+                    <form th:action="@{/admin/deleteNotification}" method="post">
+                        <input type="hidden" id="notificationId" name="notificationId" />
+                        <button type="submit" class="btn btn-danger" data-en="Delete" data-vi="Xóa">Xóa</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sendEmailNotificationsAll" class="widget container mt-5">
+        <h3 class="mb-4" data-en="Send Email Notifications All" data-vi="Gửi email thông báo tất cả">Gửi email thông báo tất cả</h3>
+        <form id="emailNotificationForm" th:action="@{/admin/sendEmailNotifications}" method="post">
+            <div class="form-group mb-3">
+                <label for="subject" data-en="Subject" data-vi="Tiêu đề">Tiêu đề</label>
+                <input type="text" class="form-control" id="subject" name="subject" placeholder="Nhập tiêu đề" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="content" data-en="Content" data-vi="Nội dung">Nội dung</label>
+                <textarea class="form-control" id="content" name="content" rows="5" placeholder="Nhập nội dung email" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submitButton" data-en="Send" data-vi="Gửi">Gửi</button>
+        </form>
+        <div id="sendingStatus" class="mt-3" style="display: none;">
+            <p data-en="Sending..." data-vi="Đang gửi...">Đang gửi...</p>
+        </div>
+    </div>
+
+    <div id="sendEmailNotificationsCustom" class="widget container mt-5">
+        <h3 class="mb-4" data-en="Send Custom Email Notifications" data-vi="Gửi email tùy chỉnh">Gửi email tùy chỉnh</h3>
+        <form id="customEmailNotificationForm" th:action="@{/admin/sendCustomEmailNotifications}" method="post">
+            <div class="form-group mb-3">
+                <label for="recipients" data-en="Recipients" data-vi="Người nhận">Người nhận</label>
+                <select multiple class="form-control" id="recipients" name="recipients">
+                    <option th:each="user : ${users}" th:value="${user.email}" th:text="${user.fullName}"></option>
+                </select>
+                <small class="form-text text-muted" data-en="Hold down the Ctrl (Windows) or Command (Mac) button to select multiple options."
+                       data-vi="Giữ phím Ctrl (Windows) hoặc Command (Mac) để chọn nhiều tài khoản cùng lúc.">Giữ phím Ctrl (Windows) hoặc Command (Mac) để chọn nhiều tài khoản cùng lúc.</small>
+            </div>
+            <div class="form-group mb-3">
+                <label for="subject" data-en="Subject" data-vi="Tiêu đề">Tiêu đề</label>
+                <input type="text" class="form-control" id="subject" name="subject" placeholder="Nhập tiêu đề" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="content" data-en="Content" data-vi="Nội dung">Nội dung</label>
+                <textarea class="form-control" id="content" name="content" rows="5" placeholder="Nhập nội dung email" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submitButton" data-en="Send" data-vi="Gửi">Gửi</button>
+        </form>
+        <div id="sendingStatus" class="mt-3" style="display: none;">
+            <p data-en="Sending..." data-vi="Đang gửi...">Đang gửi...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS, Popper.js, and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script>
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = "block";
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = "none";
+    }
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        var header = document.querySelector('.header');
+        var sidebar = document.querySelector('.sidebar');
+        var columnSettingsButton = document.querySelector('[data-en="Column Settings"]');
+
+        if (document.body.classList.contains('dark-mode')) {
+            header.style.backgroundColor = '#1a1a1a';
+            sidebar.style.backgroundColor = '#1a1a1a';
+            document.querySelectorAll('.sidebar a, .sidebar h5').forEach(function(el) {
+                el.style.color = '#e0e0e0';
+            });
+            document.querySelector('.greeting').style.color = '#e0e0e0';
+            columnSettingsButton.classList.remove('btn-outline-dark');
+            columnSettingsButton.classList.add('btn-outline-light');
+
+            document.querySelectorAll('.btn-group .btn-outline-secondary').forEach(function(el) {
+                el.classList.remove('btn-outline-secondary');
+                el.classList.add('btn-light');
+            });
+        } else {
+            header.style.backgroundColor = '#dfdfdf';
+            sidebar.style.backgroundColor = '#dfdfdf';
+            document.querySelectorAll('.sidebar a, .sidebar h5').forEach(function(el) {
+                el.style.color = '#000000';
+            });
+            document.querySelector('.greeting').style.color = '#000000';
+            columnSettingsButton.classList.remove('btn-outline-light');
+            columnSettingsButton.classList.add('btn-outline-dark');
+
+            document.querySelectorAll('.btn-group .btn-light').forEach(function(el) {
+                el.classList.remove('btn-light');
+                el.classList.add('btn-outline-secondary');
+            });
+        }
+
+        var modalContent = document.querySelector('.modal-content');
+        if (document.body.classList.contains('dark-mode')) {
+            modalContent.classList.add('dark-mode');
+            modalContent.classList.remove('light-mode');
+        } else {
+            modalContent.classList.add('light-mode');
+            modalContent.classList.remove('dark-mode');
+        }
+
+        document.querySelectorAll('.pagination .page-link').forEach(function(link) {
+            if (document.body.classList.contains('dark-mode')) {
+                link.classList.add('dark-mode');
+            } else {
+                link.classList.remove('dark-mode');
+            }
+        });
+
+        renderTablePage(currentPage);
+    }
+
+    window.addEventListener('load', function() {
+        if (document.body.classList.contains('dark-mode')) {
+            var modalContent = document.querySelector('.modal-content');
+            modalContent.classList.add('dark-mode');
+        }
+    });
+
+    function toggleLanguage() {
+        var elements = document.querySelectorAll('[data-en], [data-vi]');
+        var currentLang = document.getElementById('languageToggleImage').alt;
+
+        elements.forEach(function (element) {
+            var enText = element.getAttribute('data-en');
+            var viText = element.getAttribute('data-vi');
+            if (currentLang === 'Switch to English') {
+                element.textContent = enText;
+            } else {
+                element.textContent = viText;
+            }
+        });
+
+        var languageToggleImage = document.getElementById('languageToggleImage');
+        if (currentLang === 'Switch to English') {
+            languageToggleImage.src = 'images/vietnam.png';
+            languageToggleImage.alt = 'Switch to Vietnamese';
+            languageToggleImage.classList.add('language-icon-vietnam');
+        } else {
+            languageToggleImage.src = 'images/english.png';
+            languageToggleImage.alt = 'Switch to English';
+            languageToggleImage.classList.remove('language-icon-vietnam');
+        }
+
+        var prevPageLink = document.querySelector('#prevPage .page-link');
+        var nextPageLink = document.querySelector('#nextPage .page-link');
+        if (currentLang === 'Switch to English') {
+            prevPageLink.textContent = prevPageLink.getAttribute('data-en');
+            nextPageLink.textContent = nextPageLink.getAttribute('data-en');
+        } else {
+            prevPageLink.textContent = prevPageLink.getAttribute('data-vi');
+            nextPageLink.textContent = nextPageLink.getAttribute('data-vi');
+        }
+
+        renderTablePage(currentPage);
+    }
+
+
+    window.onload = function () {
+        document.body.classList.remove('dark-mode');
+
+        var header = document.querySelector('.header');
+        var sidebar = document.querySelector('.sidebar');
+        header.style.backgroundColor = '#dfdfdf';
+        sidebar.style.backgroundColor = '#dfdfdf';
+        document.querySelectorAll('.sidebar a, .sidebar h5').forEach(function(el) {
+            el.style.color = '#000000';
+        });
+        document.querySelector('.greeting').style.color = '#000000';
+
+        var elements = document.querySelectorAll('[data-en], [data-vi]');
+        elements.forEach(function (element) {
+            var viText = element.getAttribute('data-vi');
+            element.innerHTML = viText;
+        });
+        var languageToggleImage = document.getElementById('languageToggleImage');
+        languageToggleImage.src = 'images/english.png';
+        languageToggleImage.alt = 'Switch to English';
+        languageToggleImage.classList.remove('language-icon-vietnam');
+        renderTablePage(currentPage);
+    };
+
+    function toggleSidebar() {
+        var sidebar = document.querySelector('.sidebar');
+        var sidebarToggle = document.querySelectorAll('.sidebar-toggle');
+        var mainContent = document.querySelector('.main-content');
+
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('collapsed');
+
+        sidebarToggle.forEach(function (toggle) {
+            toggle.classList.toggle('collapsed');
+        });
+    }
+
+    function activateWidget(id) {
+        var widgets = document.querySelectorAll('.widget');
+        widgets.forEach(function (widget) {
+            widget.classList.remove('active');
+        });
+        document.getElementById(id).classList.add('active');
+        document.getElementById(id).scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+
+    function toggleSection(element) {
+        var content = element.nextElementSibling;
+        content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function goHome() {
+        window.location.href = '/home';
+    }
+
+    function sortTable(columnIndex, order) {
+        var table = document.querySelector('.table tbody');
+        var rows = Array.from(table.rows);
+
+        rows.sort(function(a, b) {
+            var cellA = a.cells[columnIndex].innerText;
+            var cellB = b.cells[columnIndex].innerText;
+
+            if (columnIndex === 0) {
+                cellA = parseInt(cellA, 10);
+                cellB = parseInt(cellB, 10);
+            }
+
+            if (order === 'asc') {
+                return cellA > cellB ? 1 : -1;
+            } else {
+                return cellA < cellB ? 1 : -1;
+            }
+        });
+
+        rows.forEach(function(row) {
+            table.appendChild(row);
+        });
+    }
+
+
+    function sortTableByLastName(order) {
+        var table = document.querySelector('.table tbody');
+        var rows = Array.from(table.rows);
+
+        rows.sort(function(a, b) {
+            var nameA = a.cells[2].innerText.split(' ').pop();
+            var nameB = b.cells[2].innerText.split(' ').pop();
+
+            if (order === 'asc') {
+                return nameA.localeCompare(nameB);
+            } else {
+                return nameB.localeCompare(nameA);
+            }
+        });
+
+        rows.forEach(function(row) {
+            table.appendChild(row);
+        });
+    }
+
+    function sortTableByRegistrationTime(order) {
+        var table = document.querySelector('.table tbody');
+        var rows = Array.from(table.rows);
+
+        rows.sort(function(a, b) {
+            var timeA = a.cells[7].innerText;
+            var timeB = b.cells[7].innerText;
+
+            var dateA = new Date(timeA.split(' ')[1].split('-').reverse().join('-') + 'T' + timeA.split(' ')[0]);
+            var dateB = new Date(timeB.split(' ')[1].split('-').reverse().join('-') + 'T' + timeB.split(' ')[0]);
+
+            if (order === 'asc') {
+                return dateB - dateA;
+            } else {
+                return dateA - dateB;
+            }
+        });
+
+        rows.forEach(function(row) {
+            table.appendChild(row);
+        });
+    }
+
+    function openColumnSettings() {
+        $('#columnSettingsModal').modal('show');
+    }
+
+    function applyColumnSettings() {
+        var checkboxes = document.querySelectorAll('#columnSettingsModal .form-check-input');
+        checkboxes.forEach(function(checkbox) {
+            var columnIndex = checkbox.value;
+            var display = checkbox.checked ? '' : 'none';
+
+            var headers = document.querySelectorAll('table th');
+            var rows = document.querySelectorAll('table tr');
+
+            headers[columnIndex].style.display = display;
+            rows.forEach(function(row) {
+                if (row.cells[columnIndex]) {
+                    row.cells[columnIndex].style.display = display;
+                }
+            });
+        });
+
+        $('#columnSettingsModal').modal('hide');
+    }
+
+    document.addEventListener('shown.bs.modal', function (event) {
+        var backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(function(backdrop) {
+            backdrop.remove();
+        });
+    });
+
+    function showImageModal(imageUrl) {
+        var modalImage = document.getElementById('modalImage');
+        modalImage.src = imageUrl;
+        var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+        imageModal.show();
+    }
+
+    let currentPage = 1;
+    const recordsPerPage = 10;
+    function renderTablePage(page) {
+        const tableBody = document.getElementById('userTableBody');
+        const rows = Array.from(tableBody.getElementsByTagName('tr'));
+        const totalRows = rows.length;
+        const totalPages = Math.ceil(totalRows / recordsPerPage);
+
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+
+        rows.forEach(row => {
+            row.style.display = 'none';
+        });
+
+        for (let i = (page - 1) * recordsPerPage; i < (page * recordsPerPage) && i < totalRows; i++) {
+            rows[i].style.display = '';
+        }
+
+        document.getElementById('prevPage').classList.toggle('disabled', page === 1);
+        document.getElementById('nextPage').classList.toggle('disabled', page === totalPages);
+
+        updatePageNumbers(totalPages, page);
+    }
+
+    function updatePageNumbers(totalPages, currentPage) {
+        const pagination = document.querySelector('.pagination');
+        const pageItems = Array.from(pagination.getElementsByClassName('page-item'));
+
+        pageItems.forEach(item => {
+            if (item.id !== 'prevPage' && item.id !== 'nextPage') {
+                item.remove();
+            }
+        });
+
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement('li');
+            li.className = 'page-item' + (i === currentPage ? ' active' : '');
+            li.innerHTML = `<a class="page-link" href="javascript:void(0);" onclick="goToPage(${i})">${i}</a>`;
+            pagination.insertBefore(li, document.getElementById('nextPage'));
+        }
+    }
+
+    function prevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderTablePage(currentPage);
+        }
+    }
+
+    function nextPage() {
+        const totalRows = document.getElementById('userTableBody').getElementsByTagName('tr').length;
+        const totalPages = Math.ceil(totalRows / recordsPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderTablePage(currentPage);
+        }
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        renderTablePage(page);
+    }
+
+    function showAll() {
+        var checkboxes = document.querySelectorAll('.btn-check');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = false;
+        });
+        applyFilters();
+        document.querySelector('.pagination').style.display = 'none';
+    }
+
+    function applyFilters() {
+        var filters = {
+            gender: [],
+            role: [],
+            active: [],
+            twoFA: [],
+            avatar: []
+        };
+
+        if (document.getElementById('filterGenderMale').checked) filters.gender.push('male');
+        if (document.getElementById('filterGenderFemale').checked) filters.gender.push('female');
+        if (document.getElementById('filterGenderOther').checked) filters.gender.push('other');
+
+        if (document.getElementById('filterRoleAdmin').checked) filters.role.push('admin');
+        if (document.getElementById('filterRoleManager').checked) filters.role.push('manager');
+        if (document.getElementById('filterRoleMember').checked) filters.role.push('member');
+        if (document.getElementById('filterRoleVIPMember').checked) filters.role.push('vipmember');
+
+        if (document.getElementById('filterActiveYes').checked) filters.active.push('✓');
+        if (document.getElementById('filterActiveNo').checked) filters.active.push('✗');
+
+        if (document.getElementById('filter2FAYes').checked) filters.twoFA.push('✓');
+        if (document.getElementById('filter2FANo').checked) filters.twoFA.push('✗');
+
+        if (document.getElementById('filterAvatarYes').checked) filters.avatar.push('✓');
+        if (document.getElementById('filterAvatarNo').checked) filters.avatar.push('✗');
+
+        if (filters.gender.length > 0 || filters.role.length > 0 || filters.active.length > 0 || filters.twoFA.length > 0 || filters.avatar.length > 0) {
+            document.querySelector('nav[aria-label="Page navigation"]').style.display = 'none';
+        } else {
+            document.querySelector('nav[aria-label="Page navigation"]').style.display = 'block';
+        }
+
+        filterTable(filters);
+    }
+
+    function filterTable(filters) {
+        var table, rows, i, genderCell, roleCell, activeCell, twoFACell, avatarCell;
+        table = document.getElementById("userTableBody");
+        rows = table.getElementsByTagName("tr");
+
+        for (i = 0; i < rows.length; i++) {
+            genderCell = rows[i].cells[4].innerText.trim().toLowerCase();
+            roleCell = rows[i].cells[5].innerText.trim().toLowerCase();
+            activeCell = rows[i].cells[6].innerText.trim();
+            twoFACell = rows[i].cells[8].innerText.trim();
+            avatarCell = rows[i].cells[9].getElementsByTagName("img")[0] ? '✓' : '✗';
+
+            var display = true;
+
+            if (filters.gender.length > 0 && !filters.gender.includes(genderCell)) display = false;
+            if (filters.role.length > 0 && !filters.role.includes(roleCell)) display = false;
+            if (filters.active.length > 0 && !filters.active.includes(activeCell)) display = false;
+            if (filters.twoFA.length > 0 && !filters.twoFA.includes(twoFACell)) display = false;
+            if (filters.avatar.length > 0 && !filters.avatar.includes(avatarCell)) display = false;
+
+            rows[i].style.display = display ? "" : "none";
+        }
+    }
+
+    renderTablePage(currentPage);
+
+    function handleSearch(event) {
+        event.preventDefault();
+
+        const searchType = document.getElementById('searchType').value;
+        const keyword = document.getElementById('keyword').value;
+
+        fetch(`/admin/search?searchType=${searchType}&keyword=${keyword}`)
+            .then(response => response.json())
+            .then(data => {
+                displaySearchResults(data.users, data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                displaySearchResults([], 'Đã xảy ra lỗi khi tìm kiếm.');
+            });
+    }
+
+    function displaySearchResults(users, message) {
+        const searchResults = document.getElementById('searchResults');
+        searchResults.innerHTML = '';
+
+        if (users.length > 0) {
+            const table = document.createElement('table');
+            table.classList.add('table', 'table-bordered', 'table-hover', 'table-striped');
+
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+        <tr>
+            <th data-en="ID" data-vi="ID">ID</th>
+            <th data-en="Username" data-vi="Tên tài khoản">Tên tài khoản</th>
+            <th data-en="Full Name" data-vi="Họ tên">Họ tên</th>
+            <th data-en="Email" data-vi="Email">Email</th>
+            <th data-en="Action" data-vi="Hành động">Hành động</th>
+        </tr>
+    `;
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+            <td>${user.id}</td>
+            <td>${user.username}</td>
+            <td>${user.fullName}</td>
+            <td>${user.email}</td>
+            <td><button class="btn btn-outline-info" data-en="Details" data-vi="Chi tiết" onclick="viewUserDetails(${user.id})">Chi tiết</button></td>
+        `;
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody);
+
+            searchResults.appendChild(table);
+        } else {
+            searchResults.innerHTML = `<p>${message}</p>`;
+        }
+
+        const searchResultsModal = new bootstrap.Modal(document.getElementById('searchResultsModal'));
+        searchResultsModal.show();
+    }
+
+    function viewUserDetails(userId) {
+        fetch(`/admin/user/${userId}`)
+            .then(response => response.json())
+            .then(user => {
+                const modalBody = document.getElementById('userDetailsBody');
+                let avatarHtml = '';
+
+                if (user.avatar) {
+                    avatarHtml = `<img src="${user.avatar}" alt="Avatar" style="width: auto; height: 50px; cursor: pointer;" onclick="showImageModal('${user.avatar}')">`;
+                } else {
+                    avatarHtml = '<span style="color: red;">✗</span>';
+                }
+
+                modalBody.innerHTML = `
+                <p><strong data-en="ID:" data-vi="ID:">ID:</strong> ${user.id}</p>
+                <p><strong data-en="Username:" data-vi="Tên tài khoản:">Tên tài khoản:</strong> ${user.username}</p>
+                <p><strong data-en="Full Name:" data-vi="Họ tên:">Họ tên:</strong> ${user.fullName}</p>
+                <p><strong data-en="Email:" data-vi="Email:">Email:</strong> ${user.email}</p>
+                <p><strong data-en="Gender:" data-vi="Giới tính:">Giới tính:</strong> ${user.title}</p>
+                <p><strong data-en="Role:" data-vi="Vai trò:">Vai trò:</strong> ${user.role}</p>
+                <p><strong data-en="Active:" data-vi="Hoạt động:">Hoạt động:</strong> ${user.active}</p>
+                <p><strong data-en="Registration Time:" data-vi="Thời gian đăng ký:">Thời gian đăng ký:</strong> ${user.registrationTime}</p>
+                <p><strong data-en="2FA:" data-vi="2FA:">2FA:</strong> ${user.totpStatus}</p>
+                <p><strong data-en="Avatar:" data-vi="Ảnh:">Ảnh:</strong> ${avatarHtml}</p>
+            `;
+
+                const userDetailsModal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+                userDetailsModal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const notification = document.getElementById("notification");
+        if (notification) {
+            setTimeout(() => {
+                notification.classList.add("fade-out");
+            }, 5000);
+        }
+    });
+
+    function calculateStatistics() {
+        const rows = document.querySelectorAll("#userTableBody tr");
+        let totalAccounts = 0;
+        let totalMale = 0;
+        let totalFemale = 0;
+        let totalOther = 0;
+        let totalAdmin = 0;
+        let totalManager = 0;
+        let totalMember = 0;
+        let totalVIPMember = 0;
+        let totalActive = 0;
+        let totalInactive = 0;
+        let total2FAEnabled = 0;
+        let total2FADisabled = 0;
+        let totalAvatarPresent = 0;
+        let totalAvatarAbsent = 0;
+
+        rows.forEach(row => {
+            totalAccounts++;
+            const gender = row.cells[4].textContent.trim();
+            const role = row.cells[5].textContent.trim();
+            const active = row.cells[6].textContent.trim();
+            const totp = row.cells[8].textContent.trim();
+            const avatar = row.cells[9].querySelector("img") ? "✓" : "✗";
+
+            if (gender === "Male") totalMale++;
+            else if (gender === "Female") totalFemale++;
+            else totalOther++;
+
+            if (role === "Admin") totalAdmin++;
+            else if (role === "Manager") totalManager++;
+            else if (role === "Member") totalMember++;
+            else if (role === "VIPMember") totalVIPMember++;
+
+            if (active === "✓") totalActive++;
+            else totalInactive++;
+
+            if (totp === "✓") total2FAEnabled++;
+            else total2FADisabled++;
+
+            if (avatar === "✓") totalAvatarPresent++;
+            else totalAvatarAbsent++;
+        });
+
+        document.getElementById("totalAccounts").textContent = totalAccounts;
+        document.getElementById("totalMale").textContent = totalMale;
+        document.getElementById("totalFemale").textContent = totalFemale;
+        document.getElementById("totalOther").textContent = totalOther;
+        document.getElementById("totalAdmin").textContent = totalAdmin;
+        document.getElementById("totalManager").textContent = totalManager;
+        document.getElementById("totalMember").textContent = totalMember;
+        document.getElementById("totalVIPMember").textContent = totalVIPMember;
+        document.getElementById("totalActive").textContent = totalActive;
+        document.getElementById("totalInactive").textContent = totalInactive;
+        document.getElementById("total2FAEnabled").textContent = total2FAEnabled;
+        document.getElementById("total2FADisabled").textContent = total2FADisabled;
+        document.getElementById("totalAvatarPresent").textContent = totalAvatarPresent;
+        document.getElementById("totalAvatarAbsent").textContent = totalAvatarAbsent;
+    }
+
+    function exportToExcel() {
+        const form = document.getElementById('exportForm');
+        const selectedColumns = Array.from(form.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
+        const users = document.querySelectorAll('#userTableBody tr');
+        const data = [];
+
+        const specificIds = form.exportSpecificId.value.split(',').map(id => id.trim()).filter(id => id);
+        const gender = form.exportGender.value;
+        const role = form.exportRole.value;
+        const active = form.exportActive.value;
+        const twoFA = form.export2FA.value;
+        const avatar = form.exportAvatar.value;
+
+        let invalidIds = [];
+        let validData = false;
+
+        users.forEach(user => {
+            const userId = user.querySelector('td[data-column="id"]').textContent.trim();
+            const userGender = user.querySelector('td[data-column="gender"]').textContent.trim();
+            const userRole = user.querySelector('td[data-column="role"]').textContent.trim();
+            const userActive = user.querySelector('td[data-column="active"]').textContent.trim();
+            const user2FA = user.querySelector('td[data-column="2fa"]').textContent.trim();
+            const userAvatar = user.querySelector('td[data-column="avatar"]').textContent.trim();
+
+            if ((specificIds.length === 0 || specificIds.includes(userId)) &&
+                (gender === '' || userGender === gender) &&
+                (role === '' || userRole === role) &&
+                (active === '' || userActive === active) &&
+                (twoFA === '' || user2FA === twoFA) &&
+                (avatar === '' || userAvatar === avatar)) {
+
+                if (specificIds.length === 0 || specificIds.includes(userId)) {
+                    validData = true;
+                }
+
+                const row = {};
+                selectedColumns.forEach(column => {
+                    let cellValue = user.querySelector(`td[data-column="${column}"]`).textContent.trim();
+
+                    if (column === 'avatar') {
+                        const avatarImg = user.querySelector(`td[data-column="${column}"] img`);
+                        cellValue = avatarImg ? '✓' : '✗';
+                    }
+
+                    row[column] = cellValue;
+                });
+                data.push(row);
+            } else if (specificIds.includes(userId) === false && specificIds.length > 0) {
+                invalidIds.push(userId);
+            }
+        });
+
+        if (specificIds.length > 0 && invalidIds.length === specificIds.length) {
+            alert(`ID(s) ${invalidIds.join(', ')} không tồn tại.`);
+            return;
+        }
+
+        if (!validData) {
+            alert('Không có dữ liệu hợp lệ để xuất.');
+            return;
+        }
+
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+
+        XLSX.writeFile(workbook, 'users.xlsx');
+    }
+
+    $(document).ready(function() {
+        $('#emailNotificationForm').on('submit', function() {
+            $('#submitButton').prop('disabled', true);
+
+            $('#sendingStatus').show();
+        });
+    });
+
+    $(document).ready(function() {
+        $('#customEmailNotificationForm').on('submit', function() {
+            $('#submitButton').prop('disabled', true);
+
+            $('#sendingStatus').show();
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var notificationModal = document.getElementById('notificationModal');
+        notificationModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var title = button.getAttribute('data-title');
+            var content = button.getAttribute('data-content');
+            var date = button.getAttribute('data-date');
+
+            var modalTitle = notificationModal.querySelector('#modalTitle');
+            var modalContent = notificationModal.querySelector('#modalContent');
+            var modalDate = notificationModal.querySelector('#modalDate');
+            var notificationIdInput = notificationModal.querySelector('#notificationId');
+
+            modalTitle.textContent = title;
+            modalContent.textContent = content;
+            modalDate.textContent = date;
+            notificationIdInput.value = id;
+        });
+    });
+</script>
+</body>
+
+</html>

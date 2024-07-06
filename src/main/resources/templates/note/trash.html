@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thùng rác</title>
+    <!-- Link đến tệp CSS của Bootstrap và Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://demos.creative-tim.com/notus-js/assets/styles/tailwind.css">
+    <link rel="stylesheet"
+          href="https://demos.creative-tim.com/notus-js/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="output.css">
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold; /* Đặt độ đậm cho font */
+        }
+
+        .navbar-nav .nav-link {
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold; /* Đặt độ đậm cho font */
+        }
+
+        .custom-warning {
+            background-color: #fff637;
+            border-color: #fff637;
+            color: #0d0c22;
+            font-weight: bold;
+        }
+
+        .custom-warning:hover {
+            background-color: #000000;
+            border-color: #000000;
+            color: #ffffff;
+        }
+
+        .custom-success {
+            background-color: #927aff;
+            border-color: #927aff;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .custom-success:hover {
+            background-color: #7454ff;
+            border-color: #7454ff;
+            color: #ffffff;
+        }
+
+        .custom-light-pink {
+            background-color: #c2eaff;
+            border-color: #c2eaff;
+            color: #000000;
+            font-weight: bold;
+        }
+
+        .custom-light-pink:hover {
+            background-color: #6bceff;
+            border-color: #6bceff;
+            color: #000000;
+        }
+
+        .custom-pink {
+            background-color: #ffd6e4;
+            border-color: #ffd6e4;
+            color: #E21033;
+            font-weight: bold;
+        }
+
+        .custom-pink:hover {
+            background-color: #ffa2c2;
+            border-color: #ffa2c2;
+            color: #E21033;
+        }
+
+        .custom-red {
+            background-color: #E21033;
+            border-color: #E21033;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .custom-red:hover {
+            background-color: #ff5c7d;
+            border-color: #ff5c7d;
+            color: #ffffff;
+        }
+
+        .custom-danger {
+            font-weight: bold;
+        }
+
+        .custom-danger:hover {
+            background-color: #000000;
+            border-color: #000000;
+            color: #ffffff;
+        }
+
+        .group {
+            display: flex;
+            line-height: 28px;
+            align-items: center;
+            position: relative;
+            max-width: 190px;
+        }
+
+        .input {
+            width: 100%;
+            height: 40px;
+            line-height: 28px;
+            padding: 0 1rem;
+            padding-left: 2.5rem;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            outline: none;
+            background-color: #f3f3f4;
+            color: #0d0c22;
+            transition: .3s ease;
+        }
+
+        .input::placeholder {
+            color: #9e9ea7;
+        }
+
+        .input:focus, .input:hover {
+            outline: none;
+            border-color: rgba(0, 0, 0, 0.4);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(44, 44, 44, 0.1);
+        }
+
+        .icon {
+            position: absolute;
+            left: 1rem;
+            fill: #9e9ea7;
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+        }
+
+        .button {
+            display: block;
+            position: relative;
+            width: 56px;
+            height: 56px;
+            margin: 0;
+            overflow: hidden;
+            outline: none;
+            background-color: transparent;
+            cursor: pointer;
+            border: 0;
+        }
+
+        .button:before,
+        .button:after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            inset: 7px;
+        }
+
+        .button:before {
+            border: 4px solid #9c9c9c;
+            transition: opacity 0.4s cubic-bezier(0.77, 0, 0.175, 1) 80ms,
+            transform 0.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) 80ms;
+        }
+
+        .button:after {
+            border: 4px solid #222436;
+            transform: scale(1.3);
+            transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+            transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            opacity: 0;
+        }
+
+        .button:hover:before,
+        .button:focus:before {
+            opacity: 0;
+            transform: scale(0.7);
+            transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+            transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .button:hover:after,
+        .button:focus:after {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.4s cubic-bezier(0.77, 0, 0.175, 1) 80ms,
+            transform 0.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) 80ms;
+        }
+
+        .button-box {
+            display: flex;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .button-elem {
+            display: block;
+            width: 20px;
+            height: 20px;
+            margin: 17px 18px 0 18px;
+            transform: rotate(180deg);
+            fill: #000000;
+        }
+
+        .button:hover .button-box,
+        .button:focus .button-box {
+            transition: 0.4s;
+            transform: translateX(-56px);
+        }
+
+        .logout-btn {
+            --black: #000000;
+            --ch-black: #141414;
+            --eer-black: #1b1b1b;
+            --night-rider: #2e2e2e;
+            --white: #ffffff;
+            --af-white: #f3f3f3;
+            --ch-white: #e1e1e1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition-duration: .3s;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+            background-color: var(--night-rider);
+        }
+
+        .logout-sign {
+            width: 100%;
+            transition-duration: .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logout-sign svg {
+            width: 17px;
+        }
+
+        .logout-sign svg path {
+            fill: var(--af-white);
+        }
+
+        .logout-text {
+            position: absolute;
+            right: 0%;
+            width: 0%;
+            opacity: 0;
+            color: var(--af-white);
+            font-size: 1.2em;
+            font-weight: 600;
+            transition-duration: .3s;
+        }
+
+        .logout-btn:hover {
+            width: 125px;
+            border-radius: 5px;
+            transition-duration: .3s;
+        }
+
+        .logout-btn:hover .logout-sign {
+            width: 30%;
+            transition-duration: .3s;
+            padding-left: 20px;
+        }
+
+        .logout-btn:hover .logout-text {
+            opacity: 1;
+            width: 70%;
+            transition-duration: .3s;
+            padding-right: 10px;
+        }
+
+        .logout-btn:active {
+            transform: translate(2px, 2px);
+        }
+
+        .delete-all {
+            width: 150px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            background: red;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+            background: #e62222;
+        }
+
+        .delete-all, .delete-all span {
+            transition: 200ms;
+        }
+
+        .delete-all .text1 {
+            transform: translateX(35px);
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            top: -8px;
+            left: -28px;
+        }
+
+        .delete-all .text2 {
+            transform: translateX(35px);
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            top: 12px;
+            left: -95px;
+        }
+
+        .delete-all .icon-delete-all {
+            position: absolute;
+            border-left: 1px solid #c41b1b;
+            transform: translateX(110px);
+            height: 40px;
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-all svg {
+            width: 15px;
+            fill: #eee;
+        }
+
+        .delete-all:hover {
+            background: #ff3636;
+        }
+
+        .delete-all:hover .text1 {
+            color: transparent;
+        }
+
+        .delete-all:hover .text2 {
+            color: transparent;
+        }
+
+        .delete-all:hover .icon-delete-all {
+            width: 150px;
+            border-left: none;
+            transform: translateX(0);
+        }
+
+        .delete-all:focus {
+            outline: none;
+        }
+
+        .delete-all:active .icon-delete-all svg {
+            transform: scale(0.8);
+        }
+
+         .alert {
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             height: 5vh;
+             text-align: center;
+             font-size: 20px;
+             background-color: #b5f3ff;
+             border: 1px solid #b5f3ff;
+             color: black;
+         }
+
+        .restore-all {
+            --main-focus: #2d8cf0;
+            --font-color: #dedede;
+            --bg-color-sub: #222;
+            --bg-color: #323232;
+            --main-color: #dedede;
+            position: relative;
+            width: 150px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .restore-all, .restore-all__icon, .restore-all__text {
+            transition: all 0.3s;
+        }
+
+        .restore-all .restore-all__text {
+            transform: translateX(33px);
+            color: var(--font-color);
+            font-weight: 600;
+        }
+
+        .restore-all .restore-all__icon {
+            position: absolute;
+            transform: translateX(109px);
+            height: 100%;
+            width: 39px;
+            background-color: var(--bg-color-sub);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .restore-all .svg {
+            width: 20px;
+            fill: var(--main-color);
+        }
+
+        .restore-all:hover {
+            background: var(--bg-color);
+        }
+
+        .restore-all:hover .restore-all__text {
+            color: transparent;
+        }
+
+        .restore-all:hover .restore-all__icon {
+            width: 148px;
+            transform: translateX(0);
+        }
+
+        .restore-all:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0px 0px var(--main-color);
+        }
+
+        .readmore-btn {
+            height: 35px; /* Điều chỉnh chiều cao */
+            width: 161px; /* Điều chỉnh chiều rộng */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-color: rgb(102, 196, 255);
+            border: none;
+            border-radius: 10px;
+            padding: 0px 15px;
+            gap: 0px;
+            transition: all 0.4s;
+            margin-bottom: 8px;
+        }
+
+        .book-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+            width: 60px; /* Điều chỉnh chiều rộng của book-wrapper */
+            height: 100%;
+        }
+
+        .book-wrapper .book-page {
+            width: 50%;
+            height: auto;
+            position: absolute;
+        }
+
+        .readmore-btn:hover .book-page {
+            animation: paging 0.4s linear infinite;
+            transform-origin: left;
+        }
+
+        .readmore-btn:hover {
+            background-color: rgb(102, 196, 255);
+        }
+
+        @keyframes paging {
+            0% {
+                transform: rotateY(0deg) skewY(0deg);
+            }
+            50% {
+                transform: rotateY(90deg) skewY(-20deg);
+            }
+            100% {
+                transform: rotateY(180deg) skewY(0deg);
+            }
+        }
+
+        .text {
+            width: 105px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px; /* Điều chỉnh kích thước font chữ */
+            color: rgb(255, 255, 255);
+        }
+
+        .deleteButton {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            background-color: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .deleteButton svg {
+            width: 44%;
+        }
+
+        .deleteButton:hover {
+            background-color: rgb(237, 56, 56);
+            overflow: visible;
+        }
+
+        .bin path {
+            transition: all 0.2s;
+        }
+
+        .deleteButton:hover .bin path {
+            fill: #fff;
+        }
+
+        .deleteButton:active {
+            transform: scale(0.98);
+        }
+
+        .tooltip {
+            --tooltip-color: rgb(41, 41, 41);
+            position: absolute;
+            top: 6px;
+            left: 163%;
+            transform: translateX(-50%) rotate(90deg);
+            background-color: var(--tooltip-color);
+            color: white;
+            border-radius: 5px;
+            font-size: 12px;
+            padding: 8px 12px;
+            font-weight: 600;
+            box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.105);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.5s;
+        }
+
+        .tooltip::before {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            transform: rotate(45deg);
+            content: "";
+            background-color: var(--tooltip-color);
+            bottom: -10%;
+        }
+
+        .deleteButton:hover .tooltip {
+            opacity: 1;
+        }
+
+        .restore1note {
+            --main-focus: #2d8cf0;
+            --font-color: #dedede;
+            --bg-color-sub: #222;
+            --bg-color: #323232;
+            --main-color: #dedede;
+            position: relative;
+            width: 160px;
+            height: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .restore1note, .restore1note__icon, .restore1note__text {
+            transition: all 0.3s;
+        }
+
+        .restore1note .restore1note__text {
+            transform: translateX(33px);
+            color: var(--font-color);
+            font-weight: 600;
+        }
+
+        .restore1note .restore1note__icon {
+            position: absolute;
+            transform: translateX(109px);
+            height: 100%;
+            width: 39px;
+            background-color: var(--bg-color-sub);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .restore1note .svg {
+            width: 20px;
+            fill: var(--main-color);
+        }
+
+        .restore1note:hover {
+            background: var(--bg-color);
+        }
+
+        .restore1note:hover .restore1note__text {
+            color: transparent;
+        }
+
+        .restore1note:hover .restore1note__icon {
+            width: 148px;
+            transform: translateX(0);
+        }
+
+        .restore1note:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0px 0px var(--main-color);
+        }
+
+        .face-follow {
+            position: relative;
+            width: 150px; /* Reduced to 50% */
+            height: 150px; /* Reduced to 50% */
+            border-radius: 50%;
+            background: #ffd93f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            margin-left: 10px; /* Adjusted margin */
+        }
+        .face-follow::before {
+            content: '';
+            position: absolute;
+            top: 90px; /* Reduced to 50% */
+            width: 75px; /* Reduced to 50% */
+            height: 35px; /* Reduced to 50% */
+            background: #b57700;
+            border-bottom-left-radius: 35px; /* Reduced to 50% */
+            border-bottom-right-radius: 35px; /* Reduced to 50% */
+            transition: 0.5s;
+        }
+        .face-follow:hover::before {
+            top: 105px; /* Reduced to 50% */
+            width: 75px; /* Reduced to 50% */
+            height: 10px; /* Reduced to 50% */
+            background: #b57700;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+        }
+        .eyes-follow {
+            position: relative;
+            top: -20px; /* Reduced to 50% */
+            display: flex;
+        }
+        .eyes-follow .eye-follow {
+            position: relative;
+            width: 40px; /* Reduced to 50% */
+            height: 40px; /* Reduced to 50% */
+            display: block;
+            background: #fff;
+            margin: 0 7.5px; /* Reduced to 50% */
+            border-radius: 50%;
+        }
+        .eyes-follow .eye-follow .pupil-follow {
+            position: absolute;
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+            width: 20px; /* Reduced to 50% */
+            height: 20px; /* Reduced to 50% */
+            background: #000;
+            border-radius: 50%;
+            transition: transform 0.1s;
+        }
+
+        #btn-message {
+            --text-color: #000;
+            --bg-color-sup: #d2d2d2;
+            --bg-color: #f4f4f4;
+            --bg-hover-color: #ffffff;
+            --online-status: #00da00;
+            --font-size: 16px;
+            --btn-transition: all 0.2s ease-out;
+        }
+
+        .button-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font: 400 var(--font-size) Helvetica Neue, sans-serif;
+            box-shadow: 0 0 2.17382px rgba(0,0,0,.049),0 1.75px 6.01034px rgba(0,0,0,.07),0 3.63px 14.4706px rgba(0,0,0,.091),0 22px 48px rgba(0,0,0,.14);
+            background-color: var(--bg-color);
+            border-radius: 68px;
+            cursor: pointer;
+            padding: 6px 10px 6px 6px;
+            width: fit-content;
+            height: 40px;
+            border: 0;
+            overflow: hidden;
+            position: relative;
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover {
+            height: 56px;
+            padding: 8px 20px 8px 8px;
+            background-color: var(--bg-hover-color);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:active {
+            transform: scale(0.99);
+        }
+
+        .content-avatar {
+            width: 30px;
+            height: 30px;
+            margin: 0;
+            transition: var(--btn-transition);
+            position: relative;
+        }
+
+        .button-message:hover .content-avatar {
+            width: 40px;
+            height: 40px;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: var(--bg-color-sup);
+        }
+
+        .user-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .status-user {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            right: 1px;
+            bottom: 1px;
+            border-radius: 50%;
+            outline: solid 2px var(--bg-color);
+            background-color: var(--online-status);
+            transition: var(--btn-transition);
+            animation: active-status 2s ease-in-out infinite;
+        }
+
+        .button-message:hover .status-user {
+            width: 10px;
+            height: 10px;
+            right: 1px;
+            bottom: 1px;
+            outline: solid 3px var(--bg-hover-color);
+        }
+
+        .notice-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            padding-left: 8px;
+            text-align: initial;
+            color: var(--text-color);
+        }
+
+        .username {
+            letter-spacing: -6px;
+            height: 0;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: var(--btn-transition);
+        }
+
+        .user-id {
+            font-size: 12px;
+            letter-spacing: -6px;
+            height: 0;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--btn-transition);
+        }
+
+        .lable-message {
+            display: flex;
+            align-items: center;
+            opacity: 1;
+            transform: scaleY(1);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover .username {
+            height: auto;
+            letter-spacing: normal;
+            opacity: 1;
+            transform: translateY(0);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover .user-id {
+            height: auto;
+            letter-spacing: normal;
+            opacity: 1;
+            transform: translateY(0);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover .lable-message {
+            height: 0;
+            transform: scaleY(0);
+            transition: var(--btn-transition);
+        }
+
+        .lable-message, .username {
+            font-weight: 600;
+        }
+
+        .number-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-left: 8px;
+            font-size: 12px;
+            width: 16px;
+            height: 16px;
+            background-color: var(--bg-color-sup);
+            border-radius: 20px;
+        }
+
+        /*==============================================*/
+        @keyframes active-status {
+            0% {
+                background-color: var(--online-status);
+            }
+
+            33.33% {
+                background-color: #93e200;
+            }
+
+            66.33% {
+                background-color: #93e200;
+            }
+
+            100% {
+                background-color: var(--online-status);
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="bg-gray-500 text-white">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <!-- Logo và tên trang -->
+            <a class="navbar-brand text-warning" th:href="@{/home}" style="font-family: 'Roboto', sans-serif;">Note
+                Myself</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <!-- Liên kết đến trang chủ -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/home}">Trang chủ</a>
+                    </li>
+                    <!-- Liên kết đến trang giới thiệu -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/note/what-is-note-myself}">What is note myself ?</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Phần "Xin chào" và nút đăng xuất -->
+            <div class="d-flex justify-content-between align-items-center ml-auto auth-container"
+                 th:if="${#authorization.expression('isAuthenticated()')}">
+                <!-- Xin chào -->
+                <button id="btn-message" class="button-message" style="right: 10px" onclick="window.location.href='/user/information'">
+                    <div class="content-avatar">
+                        <div class="status-user"></div>
+                        <div class="avatar">
+                            <div th:if="${user.avatar != null}">
+                                <img th:src="@{${user.avatar}}" alt="Avatar" class="user-img" />
+                            </div>
+                            <div th:if="${user.avatar == null}">
+                                <svg class="user-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path d="M12,12.5c-3.04,0-5.5,1.73-5.5,3.5s2.46,3.5,5.5,3.5,5.5-1.73,5.5-3.5-2.46-3.5-5.5-3.5Zm0-.5c1.66,0,3-1.34,3-3s-1.34-3-3-3-3,1.34-3,3,1.34,3,3,3Z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notice-content">
+                        <div class="username">Xin chào</div>
+                        <div class="lable-message">Information<span class="number-message">0</span></div>
+                        <div class="user-id">@<span th:text="${#authentication.principal.username}">username</span></div>
+                    </div>
+                </button>
+                <!-- Nút đăng xuất -->
+                <div id="authLinks">
+                    <div th:if="${#authorization.expression('isAuthenticated()')}">
+                        <form id="logoutForm" th:action="@{/logout}" method="post" onsubmit="handleLogout(event)"
+                              style="display: inline;">
+                            <button type="submit" class="logout-btn">
+                                <div class="logout-sign">
+                                    <svg viewBox="0 0 512 512">
+                                        <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path>
+                                    </svg>
+                                </div>
+                                <div class="logout-text">Logout</div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Thêm phần hiển thị thông báo -->
+<div th:if="${error}" class="alert alert-danger" role="alert">
+    <span th:text="${error}"></span>
+</div>
+<div th:if="${success}" class="alert alert-success" role="alert">
+    <span th:text="${success}"></span>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: center;">
+    <h1 class="font-weight-bold text-center" style="font-size: 30px; font-family: 'Poppins', sans-serif; font-weight: bold;">
+        Recycle Bin
+    </h1>
+    <div class="face-follow">
+        <div class="eyes-follow">
+            <div class="eye-follow">
+                <div class="pupil-follow"></div>
+            </div>
+            <div class="eye-follow">
+                <div class="pupil-follow"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="w-full xl:w-12/4 mb-12 xl:mb-0 px-4 mx-auto mt-24" style="margin-top: 20px">
+        <!-- Nút quay lại -->
+        <button class="button" onclick="goBack()" style="position: absolute; top: 135px; left: 19px;">
+            <div class="button-box">
+                    <span class="button-elem">
+                        <svg viewBox="0 0 46 40" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17c.5-.5.8-1.1.8-1.9z"></path>
+                        </svg>
+                    </span>
+                <span class="button-elem">
+                        <svg viewBox="0 0 46 40">
+                            <path d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17c.5-.5.8-1.1.8-1.9z"></path>
+                        </svg>
+                    </span>
+            </div>
+        </button>
+
+        <script>
+            function goBack() {
+                window.location.href = '/note/list';
+            }
+        </script>
+
+        <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded ">
+            <div class="rounded-t mb-0 px-4 py-3 border-0">
+                <div class="flex flex-wrap items-center">
+                    <div class="relative w-full px-4 max-w-full flex-grow flex-1 text-left">
+                        <!-- Nút show danh sách ghi chú trong thùng rác-->
+                        <button type="button" class="btn btn-warning rounded-pill py-0 px-4 custom-warning"
+                                onclick="window.location.href='/note/trash'">Thùng rác
+                        </button>
+                    </div>
+
+                    <!-- Nút tìm nội dung ghi chú -->
+                    <div class="group">
+                        <svg id="searchIcon" class="icon" aria-hidden="true" viewBox="0 0 24 24"
+                             onclick="event.stopPropagation(); performTrashSearch()">
+                            <g>
+                                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+                            </g>
+                        </svg>
+                        <input id="trashSearchInput" placeholder="Tìm nội dung" type="search" class="input"
+                               oninput="performTrashSearch()" onkeypress="searchTrashOnEnter(event)">
+                    </div>
+
+                    <div class="relative w-full px-4 max-w-full flex-grow flex-1 text-right flex items-center justify-end">
+                        <!-- Nút Khôi phục tất cả -->
+                        <form th:action="@{/note/restore-all}" method="post" style="display: inline;">
+                            <button type="submit" class="restore-all">
+                                <span class="restore-all__text" style="position: absolute; top: 5px; left: -10px; font-weight: bold; font-size: 15px;">Khôi phục</span>
+                                <span class="restore-all__text" style="position: absolute; top: 25px; left: 3px; font-weight: bold; font-size: 15px;">tất cả</span>
+                                <span class="restore-all__icon">
+                                    <svg class="svg" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M35.3 12.7c-2.89-2.9-6.88-4.7-11.3-4.7-8.84 0-15.98 7.16-15.98 16s7.14 16 15.98 16c7.45 0 13.69-5.1 15.46-12h-4.16c-1.65 4.66-6.07 8-11.3 8-6.63 0-12-5.37-12-12s5.37-12 12-12c3.31 0 6.28 1.38 8.45 3.55l-6.45 6.45h14v-14l-4.7 4.7z"></path>
+                                        <path d="M0 0h48v48h-48z" fill="none"></path>
+                                    </svg>
+                                </span>
+                            </button>
+
+                        </form>
+                        <!-- Nút Xóa vĩnh viễn tất cả -->
+                        <form th:action="@{/note/permanent-delete}" method="post" style="display: inline; margin-left: 10px;">
+                            <button type="submit" class="delete-all" onclick="return confirmPermanentDelete()">
+                                <span class="text1">Xóa vĩnh viễn</span>
+                                <span class="text2">tất cả</span>
+                                <span class="icon-delete-all">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                            <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path>
+                                        </svg>
+                                    </span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="block w-full overflow-x-auto">
+                <table class="items-center bg-transparent w-full border-collapse ">
+                    <thead>
+                    <tr>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                            Nội dung
+                        </th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                            Tiêu đề
+                        </th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                            Thời gian biến mất
+                        </th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                            Chức năng
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(notes)}">
+                        <td colspan="4" class="text-center py-4">Thùng rác trống</td>
+                    </tr>
+                    <tr th:each="note : ${notes}">
+                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700">
+                            <span th:text="${note.content}">Nội dung ghi chú</span>
+                        </td>
+                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
+                            <span th:text="${note.title}">Tiêu đề ghi chú</span>
+                        </td>
+                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <span th:text="${note.timeRemaining}" style="color: red;">Thời gian còn lại</span>
+                        </td>
+                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <!-- Nút chức năng xem ghi chú -->
+                            <a th:href="@{/note/read-in-trash/{id}(id=${note.id})}">
+                                <button class="readmore-btn" type="button">
+                                    <span class="book-wrapper">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="rgb(86, 69, 117)" viewBox="0 0 126 75" class="book">
+                                            <rect stroke-width="3" stroke="#fff" rx="7.5" height="70" width="121" y="2.5" x="2.5"></rect>
+                                            <line stroke-width="3" stroke="#fff" y2="75" x2="63.5" x1="63.5"></line>
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff" d="M25 20H50"></path>
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff" d="M101 20H76"></path>
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff" d="M16 30L50 30"></path>
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff" d="M110 30L76 30"></path>
+                                        </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 65 75" class="book-page">
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff" d="M40 20H15"></path>
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff" d="M49 30L15 30"></path>
+                                            <path stroke-width="3" stroke="#fff" d="M2.5 2.5H55C59.1421 2.5 62.5 5.85786 62.5 10V65C62.5 69.1421 59.1421 72.5 55 72.5H2.5V2.5Z"></path>
+                                        </svg>
+                                    </span>
+                                    <span class="text">Xem</span>
+                                </button>
+                            </a>
+
+                            <!-- Nút chức năng khôi phục ghi chú -->
+                            <a th:href="@{/note/restore/{id}(id=${note.id})}"
+                               class="restore1note">
+                                <span class="restore1note__text" style="position: absolute; top: 6px; left: -16px; font-weight: bold; font-size: 15px;">Khôi phục</span>
+                                <span class="restore1note__icon">
+                                    <svg class="svg" height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M35.3 12.7c-2.89-2.9-6.88-4.7-11.3-4.7-8.84 0-15.98 7.16-15.98 16s7.14 16 15.98 16c7.45 0 13.69-5.1 15.46-12h-4.16c-1.65 4.66-6.07 8-11.3 8-6.63 0-12-5.37-12-12s5.37-12 12-12c3.31 0 6.28 1.38 8.45 3.55l-6.45 6.45h14v-14l-4.7 4.7z"></path>
+                                        <path d="M0 0h48v48h-48z" fill="none"></path>
+                                    </svg>
+                                </span>
+                            </a>
+
+                            <!-- Nút chức năng xóa vĩnh viễn ghi chú -->
+                            <a th:href="@{/note/permanent-delete/{id}(id=${note.id})}" class="deleteButton" onclick="return confirmDelete()" style="margin-top: 13px">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 50 59" class="bin">
+                                    <path fill="#B5BAC1" d="M0 7.5C0 5.01472 2.01472 3 4.5 3H45.5C47.9853 3 50 5.01472 50 7.5V7.5C50 8.32843 49.3284 9 48.5 9H1.5C0.671571 9 0 8.32843 0 7.5V7.5Z"></path>
+                                    <path fill="#B5BAC1" d="M17 3C17 1.34315 18.3431 0 20 0H29.3125C30.9694 0 32.3125 1.34315 32.3125 3V3H17V3Z"></path>
+                                    <path fill="#B5BAC1" d="M2.18565 18.0974C2.08466 15.821 3.903 13.9202 6.18172 13.9202H43.8189C46.0976 13.9202 47.916 15.821 47.815 18.0975L46.1699 55.1775C46.0751 57.3155 44.314 59.0002 42.1739 59.0002H7.8268C5.68661 59.0002 3.92559 57.3155 3.83073 55.1775L2.18565 18.0974ZM18.0003 49.5402C16.6196 49.5402 15.5003 48.4209 15.5003 47.0402V24.9602C15.5003 23.5795 16.6196 22.4602 18.0003 22.4602C19.381 22.4602 20.5003 23.5795 20.5003 24.9602V47.0402C20.5003 48.4209 19.381 49.5402 18.0003 49.5402ZM29.5003 47.0402C29.5003 48.4209 30.6196 49.5402 32.0003 49.5402C33.381 49.5402 34.5003 48.4209 34.5003 47.0402V24.9602C34.5003 23.5795 33.381 22.4602 32.0003 22.4602C30.6196 22.4602 29.5003 23.5795 29.5003 24.9602V47.0402Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                                    <path fill="#B5BAC1" d="M2 13H48L47.6742 21.28H2.32031L2 13Z"></path>
+                                </svg>
+                                <span class="tooltip">Delete</span>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // xử lý xóa 1 ghi chú vĩnh viễn
+    function confirmDelete() {
+        // Hiển thị hộp thoại cảnh báo
+        if (confirm('Bạn có chắn chắn muốn xóa vĩnh viễn ghi chú này không?')) {
+            window.location.href = event.target.getAttribute('href');
+        } else {
+            event.preventDefault();
+        }
+    }
+
+    // xử lý xóa tất cả ghi chú vĩnh viễn
+    function confirmPermanentDelete() {
+        // Hiển thị hộp thoại cảnh báo
+        if (confirm('Bạn có muốn xóa vĩnh viễn tất cả ghi chú trong thùng rác không?')) {
+            window.location.href = event.target.getAttribute('href');
+        } else {
+            event.preventDefault();
+        }
+    }
+
+    // xử lý tìm nội dung ghi chú
+    let typingTimer; // Biến đếm thời gian chờ khi nhập
+    const doneTypingInterval = 1000; // Thời gian chờ (milliseconds)
+    let previousSearchTerm = ''; // Biến lưu trữ nội dung tìm kiếm trước đó
+
+    // Khi người dùng nhập vào ô tìm kiếm
+    document.getElementById('trashSearchInput').addEventListener('input', function () {
+        clearTimeout(typingTimer); // Xóa hẹn giờ trước đó
+        const searchTerm = document.getElementById('trashSearchInput').value.trim();
+        previousSearchTerm = searchTerm; // Lưu trữ nội dung tìm kiếm trước đó
+        if (searchTerm.length > 0) {
+            typingTimer = setTimeout(function () {
+                window.location.href = `/note/trash/search/${encodeURIComponent(searchTerm)}`;
+            }, doneTypingInterval);
+        }
+    });
+
+    // Gán hàm khôi phục nội dung đã nhập cho sự kiện window.onload để khôi phục lại nội dung sau khi tìm kiếm xong
+    window.onload = function () {
+        document.getElementById('trashSearchInput').value = previousSearchTerm; // Khôi phục lại nội dung trước đó
+    };
+
+    document.querySelector("body").addEventListener("mousemove", eyeball);
+
+    function eyeball(event) {
+        'use strict';
+        var eyes = document.querySelectorAll(".eye-follow");
+        eyes.forEach(function (eye) {
+            let eyeRect = eye.getBoundingClientRect();
+            let eyeCenterX = eyeRect.left + eye.clientWidth / 2;
+            let eyeCenterY = eyeRect.top + eye.clientHeight / 2;
+
+            let deltaX = event.pageX - eyeCenterX;
+            let deltaY = event.pageY - eyeCenterY;
+            let angle = Math.atan2(deltaY, deltaX);
+
+            let pupil = eye.querySelector('.pupil-follow');
+            let pupilMovement = 10; // Adjust this value to control the movement range of the pupil
+
+            let x = pupilMovement * Math.cos(angle);
+            let y = pupilMovement * Math.sin(angle);
+
+            pupil.style.transform = `translate(${x}px, ${y}px)`;
+        });
+    }
+
+</script>
+</body>
+</html>

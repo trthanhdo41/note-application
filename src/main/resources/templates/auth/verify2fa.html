@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nhập mã xác thực</title>
+    <style>
+        body {
+            font-family: Helvetica, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form {
+            --black: #000000;
+            --ch-black: #141414;
+            --eer-black: #1b1b1b;
+            --night-rider: #2e2e2e;
+            --white: #ffffff;
+            --af-white: #f3f3f3;
+            --ch-white: #e1e1e1;
+            --tomato: #fa5656;
+            font-family: Helvetica, sans-serif;
+            border: 2px solid var(--glow-color);
+            padding: 70px;
+            display: flex;
+            max-width: 420px;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            color: var(--night-rider);
+            background-color: var(--white);
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 10px 10px 10px rgba(0, 0, 0, .15);
+        }
+        .info {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .title {
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+        .description {
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+        .input-fields {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .input-fields input {
+            height: 2.5em;
+            width: 2.5em;
+            outline: none;
+            text-align: center;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-size: 1.5rem;
+            color: var(--ch-black);
+            border-radius: 5px;
+            border: 2.5px solid var (--ch-white);
+            background-color: var(--ch-white);
+        }
+        .input-fields input:focus {
+            border: 1px solid var(--night-rider);
+            box-shadow: inset 10px 10px 10px rgba(0, 0, 0, .15);
+            transform: scale(1.05);
+            transition: 0.5s;
+        }
+        .action-btns {
+            display: flex;
+            margin-top: 20px;
+            gap: 0.5rem;
+        }
+        .verify {
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+            text-shadow: none;
+            background: var(--ch-black);
+            box-shadow: transparent;
+            border: 1px solid var (--night-rider);
+            transition: 0.5s ease;
+            user-select: none;
+        }
+        .verify:hover, .verify:focus {
+            color: var(--white);
+            background: var(--night-rider);
+        }
+        .clear {
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--night-rider);
+            text-shadow: none;
+            background: transparent;
+            border: 1px solid var(--night-rider);
+            transition: 0.5s ease;
+            user-select: none;
+        }
+        .clear:hover, .clear:focus {
+            color: var(--tomato);
+            background-color: var(--white);
+            border: 1px solid var(--tomato);
+        }
+        .error-message {
+            color: var(--tomato);
+            margin-top: 10px;
+        }
+        .success-message {
+            color: green;
+            text-align: center;
+        }
+        .back-btn {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--ch-black);
+            color: var(--white);
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background-color: var(--night-rider);
+        }
+    </style>
+</head>
+<body>
+<form class="form" method="POST" th:action="@{/auth/verify-2fa}">
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    <div class="info">
+        <span class="title">Xác thực 2 yếu tố</span>
+        <p class="description">Nhập mã gồm 6 chữ số do ứng dụng xác thực tạo.</p>
+    </div>
+    <div class="input-fields">
+        <input placeholder="" type="tel" maxlength="1">
+        <input placeholder="" type="tel" maxlength="1">
+        <input placeholder="" type="tel" maxlength="1">
+        <input placeholder="" type="tel" maxlength="1">
+        <input placeholder="" type="tel" maxlength="1">
+        <input placeholder="" type="tel" maxlength="1">
+    </div>
+    <div class="action-btns">
+        <button type="submit" class="verify" id="verify-btn">Verify</button>
+        <a class="clear" href="#">Clear</a>
+    </div>
+    <div class="error-message" id="error-message"></div>
+    <div class="success-message" id="success-message"></div>
+    <a href="/auth/two-factor-auth" class="back-btn" id="back-btn">Quay lại</a>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('.input-fields input');
+        const verifyBtn = document.getElementById('verify-btn');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        const backBtn = document.getElementById('back-btn');
+        const formElements = document.querySelectorAll('.title, .description, .input-fields, .action-btns');
+
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        verifyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            let emptyFields = Array.from(inputs).filter(input => input.value === '').length;
+            if (emptyFields > 0) {
+                errorMessage.innerText = `Bạn nhập còn thiếu ${emptyFields} số.`;
+                successMessage.innerText = '';
+            } else {
+                errorMessage.innerText = '';
+                const totpCode = Array.from(inputs).map(input => input.value).join('');
+                fetch('/auth/verify-2fa', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="${_csrf.parameterName}"]').value
+                    },
+                    body: JSON.stringify({ totpCode: totpCode })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === 'success') {
+                            successMessage.innerText = 'Xác thực thành công!';
+                            errorMessage.innerText = '';
+                            formElements.forEach(el => el.style.display = 'none');
+                            backBtn.style.display = 'block';
+                        } else {
+                            errorMessage.innerText = data.message || 'Mã không chính xác. Vui lòng thử lại.';
+                            successMessage.innerText = '';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        errorMessage.innerText = 'Đã xảy ra lỗi. Vui lòng thử lại.';
+                        successMessage.innerText = '';
+                    });
+            }
+        });
+
+        document.querySelector('.clear').addEventListener('click', (e) => {
+            e.preventDefault();
+            inputs.forEach(input => input.value = '');
+            inputs[0].focus();
+            errorMessage.innerText = '';
+            successMessage.innerText = '';
+        });
+    });
+</script>
+</body>
+</html>

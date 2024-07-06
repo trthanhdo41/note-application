@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ghi chú của tôi</title>
+    <!-- Link đến tệp CSS của Bootstrap và Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://demos.creative-tim.com/notus-js/assets/styles/tailwind.css">
+    <link rel="stylesheet"
+          href="https://demos.creative-tim.com/notus-js/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css">
+    <link href="/static/output.css" rel="stylesheet">
+    <!--font-->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+    <style>
+        .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold; /* Đặt độ đậm cho font */
+        }
+
+        .navbar-nav .nav-link {
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold; /* Đặt độ đậm cho font */
+        }
+
+        .custom-warning {
+            background-color: #fff637;
+            border-color: #fff637;
+            color: #0d0c22;
+            font-weight: bold;
+        }
+
+        .custom-warning:hover {
+            background-color: #000000;
+            border-color: #000000;
+            color: #ffffff;
+        }
+
+        .button {
+            display: block;
+            position: relative;
+            width: 56px;
+            height: 56px;
+            margin: 0;
+            overflow: hidden;
+            outline: none;
+            background-color: transparent;
+            cursor: pointer;
+            border: 0;
+        }
+
+        .button:before,
+        .button:after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            inset: 7px;
+        }
+
+        .button:before {
+            border: 4px solid #9c9c9c;
+            transition: opacity 0.4s cubic-bezier(0.77, 0, 0.175, 1) 80ms,
+            transform 0.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) 80ms;
+        }
+
+        .button:after {
+            border: 4px solid #222436;
+            transform: scale(1.3);
+            transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+            transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            opacity: 0;
+        }
+
+        .button:hover:before,
+        .button:focus:before {
+            opacity: 0;
+            transform: scale(0.7);
+            transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+            transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .button:hover:after,
+        .button:focus:after {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 0.4s cubic-bezier(0.77, 0, 0.175, 1) 80ms,
+            transform 0.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) 80ms;
+        }
+
+        .button-box {
+            display: flex;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .button-elem {
+            display: block;
+            width: 20px;
+            height: 20px;
+            margin: 17px 18px 0 18px;
+            transform: rotate(180deg);
+            fill: #000000;
+        }
+
+        .button:hover .button-box,
+        .button:focus .button-box {
+            transition: 0.4s;
+            transform: translateX(-56px);
+        }
+
+        .group {
+            display: flex;
+            line-height: 28px;
+            align-items: center;
+            position: relative;
+            max-width: 190px;
+        }
+
+        .input {
+            width: 100%;
+            height: 40px;
+            line-height: 28px;
+            padding: 0 1rem;
+            padding-left: 2.5rem;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            outline: none;
+            background-color: #f3f3f4;
+            color: #0d0c22;
+            transition: .3s ease;
+        }
+
+        .input::placeholder {
+            color: #9e9ea7;
+        }
+
+        .input:focus, input:hover {
+            outline: none;
+            border-color: rgba(0, 0, 0, 0.4);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(44, 44, 44, 0.1);
+        }
+
+        .icon {
+            position: absolute;
+            left: 1rem;
+            fill: #9e9ea7;
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+        }
+
+        .custom-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgb(68, 68, 68);
+            border: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0px 0px 20px rgb(68, 68, 68);
+            cursor: pointer;
+            transition-duration: .3s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .custom-svgIcon {
+            width: 12px;
+            transition-duration: .3s;
+        }
+
+        .custom-svgIcon path {
+            fill: white;
+        }
+
+        .custom-button:hover {
+            width: 140px;
+            border-radius: 50px;
+            transition-duration: .3s;
+            background-color: rgb(157, 223, 255);
+            align-items: center;
+        }
+
+        .custom-button:hover .custom-svgIcon {
+            width: 50px;
+            transition-duration: .3s;
+            transform: translateY(60%);
+        }
+
+        .custom-button::before {
+            position: absolute;
+            top: -20px;
+            content: "Thùng rác";
+            color: white;
+            transition-duration: .3s;
+            font-size: 2px;
+        }
+
+        .custom-button:hover::before {
+            font-size: 13px;
+            opacity: 1;
+            transform: translateY(30px);
+            transition-duration: .3s;
+        }
+
+        .logout-btn {
+            --black: #000000;
+            --ch-black: #141414;
+            --eer-black: #1b1b1b;
+            --night-rider: #2e2e2e;
+            --white: #ffffff;
+            --af-white: #f3f3f3;
+            --ch-white: #e1e1e1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition-duration: .3s;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+            background-color: var(--night-rider);
+        }
+
+        .logout-sign {
+            width: 100%;
+            transition-duration: .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logout-sign svg {
+            width: 17px;
+        }
+
+        .logout-sign svg path {
+            fill: var(--af-white);
+        }
+
+        .logout-text {
+            position: absolute;
+            right: 0%;
+            width: 0%;
+            opacity: 0;
+            color: var(--af-white);
+            font-size: 1.2em;
+            font-weight: 600;
+            transition-duration: .3s;
+        }
+
+        .logout-btn:hover {
+            width: 125px;
+            border-radius: 5px;
+            transition-duration: .3s;
+        }
+
+        .logout-btn:hover .logout-sign {
+            width: 30%;
+            transition-duration: .3s;
+            padding-left: 20px;
+        }
+
+        .logout-btn:hover .logout-text {
+            opacity: 1;
+            width: 70%;
+            transition-duration: .3s;
+            padding-right: 10px;
+        }
+
+        .logout-btn:active {
+            transform: translate(2px, 2px);
+        }
+
+        .continue-application {
+            --color: #fff;
+            --background: #404660;
+            --background-hover: #3A4059;
+            --background-left: #2B3044;
+            --folder: #F3E9CB;
+            --folder-inner: #BEB393;
+            --paper: #FFFFFF;
+            --paper-lines: #BBC1E1;
+            --paper-behind: #E1E6F9;
+            --pencil-cap: #fff;
+            --pencil-top: #275EFE;
+            --pencil-middle: #fff;
+            --pencil-bottom: #5C86FF;
+            --shadow: rgba(13, 15, 25, .2);
+            border: none;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 19px;
+            -webkit-appearance: none;
+            -webkit-tap-highlight-color: transparent;
+            padding: 17px 29px 17px 69px;
+            transition: background 0.3s;
+            color: var(--color);
+            background: var(--bg, var(--background));
+        }
+
+        .continue-application > div {
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 53px;
+            position: absolute;
+            overflow: hidden;
+            border-radius: 5px 0 0 5px;
+            background: var(--background-left);
+        }
+
+        .continue-application > div .folder {
+            width: 23px;
+            height: 27px;
+            position: absolute;
+            left: 15px;
+            top: 13px;
+        }
+
+        .continue-application > div .folder .top {
+            left: 0;
+            top: 0;
+            z-index: 2;
+            position: absolute;
+            transform: translateX(var(--fx, 0));
+            transition: transform 0.4s ease var(--fd, 0.3s);
+        }
+
+        .continue-application > div .folder .top svg {
+            width: 24px;
+            height: 27px;
+            display: block;
+            fill: var(--folder);
+            transform-origin: 0 50%;
+            transition: transform 0.3s ease var(--fds, 0.45s);
+            transform: perspective(120px) rotateY(var(--fr, 0deg));
+        }
+
+        .continue-application > div .folder:before, .continue-application > div .folder:after,
+        .continue-application > div .folder .paper {
+            content: "";
+            position: absolute;
+            left: var(--l, 0);
+            top: var(--t, 0);
+            width: var(--w, 100%);
+            height: var(--h, 100%);
+            border-radius: 1px;
+            background: var(--b, var(--folder-inner));
+        }
+
+        .continue-application > div .folder:before {
+            box-shadow: 0 1.5px 3px var(--shadow), 0 2.5px 5px var(--shadow), 0 3.5px 7px var(--shadow);
+            transform: translateX(var(--fx, 0));
+            transition: transform 0.4s ease var(--fd, 0.3s);
+        }
+
+        .continue-application > div .folder:after,
+        .continue-application > div .folder .paper {
+            --l: 1px;
+            --t: 1px;
+            --w: 21px;
+            --h: 25px;
+            --b: var(--paper-behind);
+        }
+
+        .continue-application > div .folder:after {
+            transform: translate(var(--pbx, 0), var(--pby, 0));
+            transition: transform 0.4s ease var(--pbd, 0s);
+        }
+
+        .continue-application > div .folder .paper {
+            z-index: 1;
+            --b: var(--paper);
+        }
+
+        .continue-application > div .folder .paper:before, .continue-application > div .folder .paper:after {
+            content: "";
+            width: var(--wp, 14px);
+            height: 2px;
+            border-radius: 1px;
+            transform: scaleY(0.5);
+            left: 3px;
+            top: var(--tp, 3px);
+            position: absolute;
+            background: var(--paper-lines);
+            box-shadow: 0 12px 0 0 var(--paper-lines), 0 24px 0 0 var(--paper-lines);
+        }
+
+        .continue-application > div .folder .paper:after {
+            --tp: 6px;
+            --wp: 10px;
+        }
+
+        .continue-application > div .pencil {
+            height: 2px;
+            width: 3px;
+            border-radius: 1px 1px 0 0;
+            top: 8px;
+            left: 105%;
+            position: absolute;
+            z-index: 3;
+            transform-origin: 50% 19px;
+            background: var(--pencil-cap);
+            transform: translateX(var(--pex, 0)) rotate(35deg);
+            transition: transform 0.4s ease var(--pbd, 0s);
+        }
+
+        .continue-application > div .pencil:before, .continue-application > div .pencil:after {
+            content: "";
+            position: absolute;
+            display: block;
+            background: var(--b, linear-gradient(var(--pencil-top) 55%, var(--pencil-middle) 55.1%, var(--pencil-middle) 60%, var(--pencil-bottom) 60.1%));
+            width: var(--w, 5px);
+            height: var(--h, 20px);
+            border-radius: var(--br, 2px 2px 0 0);
+            top: var(--t, 2px);
+            left: var(--l, -1px);
+        }
+
+        .continue-application > div .pencil:before {
+            -webkit-clip-path: polygon(0 5%, 5px 5%, 5px 17px, 50% 20px, 0 17px);
+            clip-path: polygon(0 5%, 5px 5%, 5px 17px, 50% 20px, 0 17px);
+        }
+
+        .continue-application > div .pencil:after {
+            --b: none;
+            --w: 3px;
+            --h: 6px;
+            --br: 0 2px 1px 0;
+            --t: 3px;
+            --l: 3px;
+            border-top: 1px solid var(--pencil-top);
+            border-right: 1px solid var(--pencil-top);
+        }
+
+        .continue-application:before, .continue-application:after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 2px;
+            border-radius: 1px;
+            background: var(--color);
+            transform-origin: 9px 1px;
+            transform: translateX(var(--cx, 0)) scale(0.5) rotate(var(--r, -45deg));
+            top: 26px;
+            right: 16px;
+            transition: transform 0.3s;
+        }
+
+        .continue-application:after {
+            --r: 45deg;
+        }
+
+        .continue-application:hover {
+            --cx: 2px;
+            --bg: var(--background-hover);
+            --fx: -40px;
+            --fr: -60deg;
+            --fd: .15s;
+            --fds: 0s;
+            --pbx: 3px;
+            --pby: -3px;
+            --pbd: .15s;
+            --pex: -24px;
+        }
+
+        .typewriter {
+            --blue: #7d7d7d;
+            --blue-dark: #2f2f2f;
+            --key: #fff;
+            --paper: #EEF0FD;
+            --text: #D3D4EC;
+            --tool: #FBC56C;
+            --duration: 3s;
+            position: relative;
+            -webkit-animation: bounce05 var(--duration) linear infinite;
+            animation: bounce05 var(--duration) linear infinite;
+        }
+
+        .typewriter .slide {
+            width: 92px;
+            height: 20px;
+            border-radius: 3px;
+            margin-left: 14px;
+            transform: translateX(14px);
+            background: linear-gradient(var(--blue), var(--blue-dark));
+            -webkit-animation: slide05 var(--duration) ease infinite;
+            animation: slide05 var(--duration) ease infinite;
+        }
+
+        .typewriter .slide:before, .typewriter .slide:after,
+        .typewriter .slide i:before {
+            content: "";
+            position: absolute;
+            background: var(--tool);
+        }
+
+        .typewriter .slide:before {
+            width: 2px;
+            height: 8px;
+            top: 6px;
+            left: 100%;
+        }
+
+        .typewriter .slide:after {
+            left: 94px;
+            top: 3px;
+            height: 14px;
+            width: 6px;
+            border-radius: 3px;
+        }
+
+        .typewriter .slide i {
+            display: block;
+            position: absolute;
+            right: 100%;
+            width: 6px;
+            height: 4px;
+            top: 4px;
+            background: var(--tool);
+        }
+
+        .typewriter .slide i:before {
+            right: 100%;
+            top: -2px;
+            width: 4px;
+            border-radius: 2px;
+            height: 14px;
+        }
+
+        .typewriter .paper {
+            position: absolute;
+            left: 24px;
+            top: -26px;
+            width: 40px;
+            height: 46px;
+            border-radius: 5px;
+            background: var(--paper);
+            transform: translateY(46px);
+            -webkit-animation: paper05 var(--duration) linear infinite;
+            animation: paper05 var(--duration) linear infinite;
+        }
+
+        .typewriter .paper:before {
+            content: "";
+            position: absolute;
+            left: 6px;
+            right: 6px;
+            top: 7px;
+            border-radius: 2px;
+            height: 4px;
+            transform: scaleY(0.8);
+            background: var(--text);
+            box-shadow: 0 12px 0 var(--text), 0 24px 0 var(--text), 0 36px 0 var(--text);
+        }
+
+        .typewriter .keyboard {
+            width: 120px;
+            height: 56px;
+            margin-top: -10px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .typewriter .keyboard:before, .typewriter .keyboard:after {
+            content: "";
+            position: absolute;
+        }
+
+        .typewriter .keyboard:before {
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 7px;
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            transform: perspective(10px) rotateX(2deg);
+            transform-origin: 50% 100%;
+        }
+
+        .typewriter .keyboard:after {
+            left: 2px;
+            top: 25px;
+            width: 11px;
+            height: 4px;
+            border-radius: 2px;
+            box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+            -webkit-animation: keyboard05 var(--duration) linear infinite;
+            animation: keyboard05 var(--duration) linear infinite;
+        }
+
+        @keyframes bounce05 {
+            85%, 92%, 100% {
+                transform: translateY(0);
+            }
+
+            89% {
+                transform: translateY(-4px);
+            }
+
+            95% {
+                transform: translateY(2px);
+            }
+        }
+
+        @keyframes slide05 {
+            5% {
+                transform: translateX(14px);
+            }
+
+            15%, 30% {
+                transform: translateX(6px);
+            }
+
+            40%, 55% {
+                transform: translateX(0);
+            }
+
+            65%, 70% {
+                transform: translateX(-4px);
+            }
+
+            80%, 89% {
+                transform: translateX(-12px);
+            }
+
+            100% {
+                transform: translateX(14px);
+            }
+        }
+
+        @keyframes paper05 {
+            5% {
+                transform: translateY(46px);
+            }
+
+            20%, 30% {
+                transform: translateY(34px);
+            }
+
+            40%, 55% {
+                transform: translateY(22px);
+            }
+
+            65%, 70% {
+                transform: translateY(10px);
+            }
+
+            80%, 85% {
+                transform: translateY(0);
+            }
+
+            92%, 100% {
+                transform: translateY(46px);
+            }
+        }
+
+        @keyframes keyboard05 {
+            5%, 12%, 21%, 30%, 39%, 48%, 57%, 66%, 75%, 84% {
+                box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+            }
+
+            9% {
+                box-shadow: 15px 2px 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+            }
+
+            18% {
+                box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 2px 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+            }
+
+            27% {
+                box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 12px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+            }
+
+            36% {
+                box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 12px 0 var(--key), 60px 12px 0 var(--key), 68px 12px 0 var(--key), 83px 10px 0 var(--key);
+            }
+
+            45% {
+                box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 2px 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+            }
+
+            54% {
+                box-shadow: 15px 0 0 var(--key), 30px 2px 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+            }
+
+            63% {
+                box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 12px 0 var(--key);
+            }
+
+            72% {
+                box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 2px 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 10px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+            }
+
+            81% {
+                box-shadow: 15px 0 0 var(--key), 30px 0 0 var(--key), 45px 0 0 var(--key), 60px 0 0 var(--key), 75px 0 0 var(--key), 90px 0 0 var(--key), 22px 10px 0 var(--key), 37px 12px 0 var(--key), 52px 10px 0 var(--key), 60px 10px 0 var(--key), 68px 10px 0 var(--key), 83px 10px 0 var(--key);
+            }
+        }
+
+        .button-text-add {
+            position: absolute;
+            top: 51%;
+            left: 58%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            line-height: 19px;
+        }
+
+        .delete-all {
+            width: 150px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            background: red;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+            background: #e62222;
+        }
+
+        .delete-all, .delete-all span {
+            transition: 200ms;
+        }
+
+        .delete-all .text {
+            transform: translateX(35px);
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            top: 0px;
+            left: -27px;
+        }
+
+        .delete-all .icon-delete-all {
+            position: absolute;
+            border-left: 1px solid #c41b1b;
+            transform: translateX(110px);
+            height: 40px;
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-all svg {
+            width: 15px;
+            fill: #eee;
+        }
+
+        .delete-all:hover {
+            background: #ff3636;
+        }
+
+        .delete-all:hover .text {
+            color: transparent;
+        }
+
+        .delete-all:hover .icon-delete-all {
+            width: 150px;
+            border-left: none;
+            transform: translateX(0);
+        }
+
+        .delete-all:focus {
+            outline: none;
+        }
+
+        .delete-all:active .icon-delete-all svg {
+            transform: scale(0.8);
+        }
+
+        .readmore-btn {
+            height: 35px; /* Điều chỉnh chiều cao */
+            width: 161px; /* Điều chỉnh chiều rộng */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-color: rgb(102 196 255);
+            border: none;
+            border-radius: 10px;
+            padding: 0px 15px;
+            gap: 0px;
+            transition: all 0.4s;
+            margin-bottom: 8px;
+        }
+
+        .book-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+            width: 60px; /* Điều chỉnh chiều rộng của book-wrapper */
+            height: 100%;
+        }
+
+        .book-wrapper .book-page {
+            width: 50%;
+            height: auto;
+            position: absolute;
+        }
+
+        .readmore-btn:hover .book-page {
+            animation: paging 0.4s linear infinite;
+            transform-origin: left;
+        }
+
+        .readmore-btn:hover {
+            background-color: rgb(102 196 255);
+        }
+
+        @keyframes paging {
+            0% {
+                transform: rotateY(0deg) skewY(0deg);
+            }
+            50% {
+                transform: rotateY(90deg) skewY(-20deg);
+            }
+            100% {
+                transform: rotateY(180deg) skewY(0deg);
+            }
+        }
+
+        .text {
+            width: 105px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px; /* Điều chỉnh kích thước font chữ */
+            color: rgb(255, 255, 255);
+        }
+
+        .edit-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100px;
+            height: 40px;
+            border: none;
+            padding: 0px 20px;
+            background-color: rgb(64 70 96);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+            transition-duration: .3s;
+        }
+
+        .edit-svg {
+            width: 13px;
+            position: absolute;
+            right: 0;
+            margin-right: 20px;
+            fill: white;
+            transition-duration: .3s;
+        }
+
+        .edit-btn:hover {
+            color: transparent;
+        }
+
+        .edit-btn:hover .edit-svg {
+            right: 43%;
+            margin: 0;
+            padding: 0;
+            border: none;
+            transition-duration: .3s;
+        }
+
+        .edit-btn:active {
+            transform: translate(3px, 3px);
+            transition-duration: .3s;
+            box-shadow: 2px 2px 0px rgb(140, 32, 212);
+        }
+
+        .deleteButton {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            background-color: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .deleteButton svg {
+            width: 44%;
+        }
+
+        .deleteButton:hover {
+            background-color: rgb(237, 56, 56);
+            overflow: visible;
+        }
+
+        .bin path {
+            transition: all 0.2s;
+        }
+
+        .deleteButton:hover .bin path {
+            fill: #fff;
+        }
+
+        .deleteButton:active {
+            transform: scale(0.98);
+        }
+
+        .tooltip {
+            --tooltip-color: rgb(41, 41, 41);
+            position: absolute;
+            top: 6px;
+            left: 163%;
+            transform: translateX(-50%) rotate(90deg);
+            background-color: var(--tooltip-color);
+            color: white;
+            border-radius: 5px;
+            font-size: 12px;
+            padding: 8px 12px;
+            font-weight: 600;
+            box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.105);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.5s;
+        }
+
+        .tooltip::before {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            transform: rotate(45deg);
+            content: "";
+            background-color: var(--tooltip-color);
+            bottom: -10%;
+        }
+
+        .deleteButton:hover .tooltip {
+            opacity: 1;
+        }
+
+        .edit-btn, .deleteButton {
+            margin-right: 10px;
+        }
+
+        .container-btn-file {
+            height: 50px;
+            display: flex;
+            position: relative;
+            justify-content: center;
+            align-items: center;
+            background-color: #307750;
+            color: #fff;
+            border-style: none;
+            padding: 1em 2em;
+            border-radius: 0.5em;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 4px 8px 10px -3px rgba(0, 0, 0, 0.356);
+            transition: all 250ms;
+        }
+
+        .container-btn-file input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .container-btn-file > svg {
+            margin-right: 1em;
+        }
+
+        .container-btn-file::before {
+            content: "";
+            position: absolute;
+            height: 100%;
+            width: 0;
+            border-radius: 0.5em;
+            background-color: #469b61;
+            z-index: -1;
+            transition: all 350ms;
+        }
+
+        .container-btn-file:hover::before {
+            width: 100%;
+        }
+
+        #btn-message {
+            --text-color: #000;
+            --bg-color-sup: #d2d2d2;
+            --bg-color: #f4f4f4;
+            --bg-hover-color: #ffffff;
+            --online-status: #00da00;
+            --font-size: 16px;
+            --btn-transition: all 0.2s ease-out;
+        }
+
+        .button-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font: 400 var(--font-size) Helvetica Neue, sans-serif;
+            box-shadow: 0 0 2.17382px rgba(0, 0, 0, .049), 0 1.75px 6.01034px rgba(0, 0, 0, .07), 0 3.63px 14.4706px rgba(0, 0, 0, .091), 0 22px 48px rgba(0, 0, 0, .14);
+            background-color: var(--bg-color);
+            border-radius: 68px;
+            cursor: pointer;
+            padding: 6px 10px 6px 6px;
+            width: fit-content;
+            height: 40px;
+            border: 0;
+            overflow: hidden;
+            position: relative;
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover {
+            height: 56px;
+            padding: 8px 20px 8px 8px;
+            background-color: var(--bg-hover-color);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:active {
+            transform: scale(0.99);
+        }
+
+        .content-avatar {
+            width: 30px;
+            height: 30px;
+            margin: 0;
+            transition: var(--btn-transition);
+            position: relative;
+        }
+
+        .button-message:hover .content-avatar {
+            width: 40px;
+            height: 40px;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: var(--bg-color-sup);
+        }
+
+        .user-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .status-user {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            right: 1px;
+            bottom: 1px;
+            border-radius: 50%;
+            outline: solid 2px var(--bg-color);
+            background-color: var(--online-status);
+            transition: var(--btn-transition);
+            animation: active-status 2s ease-in-out infinite;
+        }
+
+        .button-message:hover .status-user {
+            width: 10px;
+            height: 10px;
+            right: 1px;
+            bottom: 1px;
+            outline: solid 3px var(--bg-hover-color);
+        }
+
+        .notice-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            padding-left: 8px;
+            text-align: initial;
+            color: var(--text-color);
+        }
+
+        .username {
+            letter-spacing: -6px;
+            height: 0;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: var(--btn-transition);
+        }
+
+        .user-id {
+            font-size: 12px;
+            letter-spacing: -6px;
+            height: 0;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--btn-transition);
+        }
+
+        .lable-message {
+            display: flex;
+            align-items: center;
+            opacity: 1;
+            transform: scaleY(1);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover .username {
+            height: auto;
+            letter-spacing: normal;
+            opacity: 1;
+            transform: translateY(0);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover .user-id {
+            height: auto;
+            letter-spacing: normal;
+            opacity: 1;
+            transform: translateY(0);
+            transition: var(--btn-transition);
+        }
+
+        .button-message:hover .lable-message {
+            height: 0;
+            transform: scaleY(0);
+            transition: var(--btn-transition);
+        }
+
+        .lable-message, .username {
+            font-weight: 600;
+        }
+
+        .number-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-left: 8px;
+            font-size: 12px;
+            width: 16px;
+            height: 16px;
+            background-color: var(--bg-color-sup);
+            border-radius: 20px;
+        }
+
+        /*==============================================*/
+        @keyframes active-status {
+            0% {
+                background-color: var(--online-status);
+            }
+
+            33.33% {
+                background-color: #93e200;
+            }
+
+            66.33% {
+                background-color: #93e200;
+            }
+
+            100% {
+                background-color: var(--online-status);
+            }
+        }
+
+        .btn-team-note {
+            border: none;
+            width: 161px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            background: #a95bff;
+            cursor: pointer;
+            transition: all 450ms ease-in-out;
+        }
+
+        .sparkle {
+            fill: #ececec;
+            transition: all 800ms ease;
+        }
+
+        .text {
+            font-weight: 600;
+            color: #ececec;
+            font-size: medium;
+        }
+
+        .btn-team-note:hover {
+            background: linear-gradient(0deg, #A47CF3, #683FEA);
+            box-shadow: inset 0px 1px 0px 0px rgba(255, 255, 255, 0.4),
+            inset 0px -4px 0px 0px rgba(0, 0, 0, 0.2),
+            0px 0px 0px 4px rgba(255, 255, 255, 0.2),
+            0px 0px 180px 0px #9917FF;
+            transform: translateY(-2px);
+        }
+
+        .btn-team-note:hover .text {
+            color: white;
+        }
+
+        .btn-team-note:hover .sparkle {
+            fill: white;
+            transform: scale(1.2);
+        }
+
+        .notification-button {
+            right: 17px;
+            width: fit-content;
+            height: fit-content;
+            background-color: rgb(248 249 250);
+            border-radius: 7px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .notification-button:hover {
+            background-color: rgba(117, 117, 117, 0.69);
+        }
+
+        .notification-button:hover svg {
+            color: white;
+        }
+
+        .notification-bell-icon {
+            color: black;
+            transform: scale(1.2);
+            transition: 0.2s;
+        }
+
+        .notification-point {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            width: 6px;
+            height: 6px;
+            background-color: rgb(0, 255, 0);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-point::before {
+            content: "";
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background-color: rgb(0, 255, 0);
+            border-radius: 25px;
+            animation: notification-loop 1s 0s infinite;
+        }
+
+        @keyframes notification-loop {
+            0% {
+                background-color: rgb(0, 255, 0);
+                width: 1px;
+                height: 1px;
+            }
+            100% {
+                background-color: rgba(0, 255, 0, 0);
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        .notification-popup {
+            display: none;
+            opacity: 0;
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            width: 300px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(-10px);
+        }
+
+        .notification-popup.show {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification-popup h5 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-list li {
+            padding: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .notification-list li:hover {
+            background-color: #f0f0f0;
+        }
+
+        .notification-list hr {
+            margin: 10px 0;
+        }
+
+        .notification-popup .card-footer {
+            padding: 10px;
+        }
+
+        .notification-popup .btn-link {
+            text-decoration: none;
+        }
+
+        .notification-popup .btn-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<!--header-->
+<header class="bg-gray-500 text-white">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <!-- Logo và tên trang -->
+            <a class="navbar-brand text-warning" th:href="@{/home}" style="font-family: 'Roboto', sans-serif;">Note
+                Myself</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <!-- Liên kết đến trang chủ -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/home}">Trang chủ</a>
+                    </li>
+                    <!-- Liên kết đến trang giới thiệu -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/note/what-is-note-myself}">What is note myself ?</a>
+                    </li>
+                </ul>
+            </div>
+            <button class="notification-button" id="notificationButton">
+                <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        height="24"
+                        width="24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                        class="notification-bell-icon"
+                >
+                    <path
+                            d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.292-.538 1.292H5.538C5 18 5 17.301 5 16.708c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365ZM8.733 18c.094.852.306 1.54.944 2.112a3.48 3.48 0 0 0 4.646 0c.638-.572 1.236-1.26 1.33-2.112h-6.92Z"
+                            stroke-width="2"
+                            stroke-linejoin="round"
+                            stroke-linecap="round"
+                            stroke="currentColor"
+                    ></path>
+                </svg>
+                <div class="notification-point"></div>
+            </button>
+            <!-- Popup Thông Báo -->
+            <div class="notification-popup card shadow" id="notificationPopup">
+                <div class="card-header">
+                    <h5 class="card-title mb-0" data-en="Notifications" data-vi="Thông báo">Thông báo</h5>
+                </div>
+                <ul class="list-group list-group-flush notification-list">
+                    <li class="list-group-item">Chưa có thông báo nào</li>
+                </ul>
+                <div class="card-footer text-center">
+                    <button class="btn btn-link" id="showMoreBtn" style="display: none;">Xem thêm</button>
+                </div>
+            </div>
+            <!-- Phần "Xin chào" và nút đăng xuất -->
+            <div class="d-flex justify-content-between align-items-center ml-auto auth-container"
+                 th:if="${#authorization.expression('isAuthenticated()')}">
+                <!-- Xin chào -->
+                <button id="btn-message" class="button-message" style="right: 10px"
+                        onclick="window.location.href='/user/information'">
+                    <div class="content-avatar">
+                        <div class="status-user"></div>
+                        <div class="avatar">
+                            <svg class="user-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12,12.5c-3.04,0-5.5,1.73-5.5,3.5s2.46,3.5,5.5,3.5,5.5-1.73,5.5-3.5-2.46-3.5-5.5-3.5Zm0-.5c1.66,0,3-1.34,3-3s-1.34-3-3-3-3,1.34-3,3,1.34,3,3,3Z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="notice-content">
+                        <div class="username">Xin chào</div>
+                        <div class="lable-message"><span th:text="${fullName}">fullname</span><span
+                                class="number-message">0</span></div>
+                        <div class="user-id">@<span th:text="${fullName}">fullname</span></div>
+                    </div>
+                </button>
+                <!-- Nút đăng xuất -->
+                <div id="authLinks">
+                    <div th:if="${#authorization.expression('isAuthenticated()')}">
+                        <form id="logoutForm" th:action="@{/logout}" method="post" onsubmit="handleLogout(event)"
+                              style="display: inline;">
+                            <button type="submit" class="logout-btn">
+                                <div class="logout-sign">
+                                    <svg viewBox="0 0 512 512">
+                                        <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path>
+                                    </svg>
+                                </div>
+                                <div class="logout-text">Logout</div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+<!--end header-->
+
+<section class="py-1 bg-blueGray-50">
+    <h1 class="font-weight-bold text-center"
+        style="font-size: 30px;font-family: 'Poppins', sans-serif; font-weight: bold; ">My notes</h1>
+    <div class="typewriter" style="left: 676px; top: 15px; width: 794px;">
+        <div class="slide"><i></i></div>
+        <div class="paper"></div>
+        <div class="keyboard"></div>
+    </div>
+    <div class="w-full xl:w-12/4 mb-12 xl:mb-0 px-4 mx-auto mt-24" style="margin-bottom: 346px">
+        <button class="button" onclick="goBack()" style="position: absolute; top: 98px; left: 19px;">
+            <div class="button-box">
+        <span class="button-elem">
+            <svg viewBox="0 0 46 40" xmlns="http://www.w3.org/2000/svg">
+                <path d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17c.5-.5.8-1.1.8-1.9z"></path>
+            </svg>
+        </span>
+                <span class="button-elem">
+            <svg viewBox="0 0 46 40">
+                <path d="M46 20.038c0-.7-.3-1.5-.8-2.1l-16-17c-1.1-1-3.2-1.4-4.4-.3-1.2 1.1-1.2 3.3 0 4.4l11.3 11.9H3c-1.7 0-3 1.3-3 3s1.3 3 3 3h33.1l-11.3 11.9c-1 1-1.2 3.3 0 4.4 1.2 1.1 3.3.8 4.4-.3l16-17c.5-.5.8-1.1.8-1.9z"></path>
+            </svg>
+        </span>
+            </div>
+        </button>
+
+        <script>
+            function goBack() {
+                window.location.href = '/home';
+            }
+        </script>
+
+        <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded ">
+            <div class="rounded-t mb-0 px-4 py-3 border-0">
+                <div class="flex flex-wrap items-center">
+
+                    <div class="relative w-full px-4 max-w-full flex-grow flex-1 text-left">
+                        <!-- Nút Tất cả ghi chú -->
+                        <button type="button" class="btn btn-warning rounded-pill py-0 px-4 custom-warning"
+                                data-mdb-ripple-init onclick="window.location.href='/note/list'">Tất cả ghi chú
+                        </button>
+                    </div>
+
+                    <!-- Nút tìm nội dung ghi chú -->
+                    <div class="group" style="left: -166px">
+                        <svg id="searchIcon" class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                            <g>
+                                <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+                            </g>
+                        </svg>
+                        <input id="searchInput" placeholder="Tìm nội dung" type="search" class="input">
+                    </div>
+
+                    <div class="relative w-full px-4 max-w-full flex-grow flex-1 text-right flex items-center justify-end gap-2">
+                        <!-- Nút Thêm ghi chú -->
+                        <button class="continue-application" style="width: 191px; height: 50px; position: relative;"
+                                onclick="window.location.href='/note/create'">
+                            <div>
+                                <div class="pencil"></div>
+                                <div class="folder">
+                                    <div class="top">
+                                        <svg viewBox="0 0 24 27">
+                                            <path d="M1,0 L23,0 C23.5522847,-1.01453063e-16 24,0.44771525 24,1 L24,8.17157288 C24,8.70200585 23.7892863,9.21071368 23.4142136,9.58578644 L20.5857864,12.4142136 C20.2107137,12.7892863 20,13.2979941 20,13.8284271 L20,26 C20,26.5522847 19.5522847,27 19,27 L1,27 C0.44771525,27 6.76353751e-17,26.5522847 0,26 L0,1 C-6.76353751e-17,0.44771525 0.44771525,1.01453063e-16 1,0 Z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="paper"></div>
+                                </div>
+                            </div>
+                            <span class="button-text-add">Thêm note</span>
+                        </button>
+
+                        <!-- Nút Xóa tất cả -->
+                        <form th:action="@{/note/move-all-to-trash}" method="post" style="display: inline;">
+                            <button type="submit" class="delete-all"
+                                    onclick="return confirm('Bạn có chắn chắn muốn xóa tất cả ghi chú không?')">
+                                <span class="text">Xóa tất cả</span>
+                                <span class="icon-delete-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                        <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"></path>
+                                    </svg>
+                                </span>
+                            </button>
+                        </form>
+
+                        <!--Nút download ghi chú-->
+                        <button class="container-btn-file" onclick="window.location.href='/note/download'">
+                            <svg fill="#fff" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                 viewBox="0 0 50 50">
+                                <path
+                                        d="M28.8125 .03125L.8125 5.34375C.339844
+                                        5.433594 0 5.863281 0 6.34375L0 43.65625C0
+                                        44.136719 .339844 44.566406 .8125 44.65625L28.8125
+                                        49.96875C28.875 49.980469 28.9375 50 29 50C29.230469
+                                        50 29.445313 49.929688 29.625 49.78125C29.855469 49.589844
+                                        30 49.296875 30 49L30 1C30 .703125 29.855469 .410156 29.625
+                                        .21875C29.394531 .0273438 29.105469 -.0234375 28.8125 .03125ZM32
+                                        6L32 13L34 13L34 15L32 15L32 20L34 20L34 22L32 22L32 27L34 27L34
+                                        29L32 29L32 35L34 35L34 37L32 37L32 44L47 44C48.101563 44 49
+                                        43.101563 49 42L49 8C49 6.898438 48.101563 6 47 6ZM36 13L44
+                                        13L44 15L36 15ZM6.6875 15.6875L11.8125 15.6875L14.5 21.28125C14.710938
+                                        21.722656 14.898438 22.265625 15.0625 22.875L15.09375 22.875C15.199219
+                                        22.511719 15.402344 21.941406 15.6875 21.21875L18.65625 15.6875L23.34375
+                                        15.6875L17.75 24.9375L23.5 34.375L18.53125 34.375L15.28125
+                                        28.28125C15.160156 28.054688 15.035156 27.636719 14.90625
+                                        27.03125L14.875 27.03125C14.8125 27.316406 14.664063 27.761719
+                                        14.4375 28.34375L11.1875 34.375L6.1875 34.375L12.15625 25.03125ZM36
+                                        20L44 20L44 22L36 22ZM36 27L44 27L44 29L36 29ZM36 35L44 35L44 37L36 37Z"></path>
+                            </svg>
+                            Download
+                        </button>
+
+                        <!--nút ghi chú nhóm-->
+                        <form th:action="@{/group/choice}" method="get">
+                            <button type="submit" class="btn-team-note">
+                                <svg height="24" width="24" fill="#FFFFFF" viewBox="0 0 24 24" data-name="Layer 1"
+                                     id="Layer_1" class="sparkle">
+                                    <path d="M10,21.236,6.755,14.745.264,11.5,6.755,8.255,10,1.764l3.245,6.491L19.736,11.5l-6.491,3.245ZM18,21l1.5,3L21,21l3-1.5L21,18l-1.5-3L18,18l-3,1.5ZM19.333,4.667,20.5,7l1.167-2.333L24,3.5,21.667,2.333,20.5,0,19.333,2.333,17,3.5Z"></path>
+                                </svg>
+                                <span class="text">Ghi chú nhóm</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="block w-full overflow-x-auto">
+                <table class="items-center bg-transparent w-full border-collapse ">
+                    <thead>
+                    <tr>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                            Nội dung
+                        </th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                            Tiêu đề
+                        </th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                            Thời gian tạo
+                        </th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                            Chức năng
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Hiển thị thông báo nếu không tìm thấy ghi chú nào -->
+                    <tr th:if="${message}">
+                        <td colspan="4" class="text-center py-4" th:text="${message}"></td>
+                    </tr>
+                    <!-- Sử dụng Thymeleaf để kiểm tra xem danh sách ghi chú có trống không, chỉ hiển thị khi không có message -->
+                    <tr th:if="${#lists.isEmpty(notes)} and ${message == null}">
+                        <td colspan="4" class="text-center py-4">Danh sách ghi chú đang trống</td>
+                    </tr>
+                    <!-- Lặp qua danh sách ghi chú và hiển thị mỗi ghi chú trong một dòng -->
+                    <tr th:each="note : ${notes}">
+                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left text-blueGray-700">
+                            <span th:text="${note.content}">Nội dung ghi chú</span>
+                        </td>
+                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ">
+                            <span th:text="${note.title}">Tiêu đề ghi chú</span>
+                        </td>
+                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <span th:text="${note.createdAt}">Thời gian ghi chú</span>
+                        </td>
+                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <!-- Nút chức năng xem ghi chú -->
+                            <a th:href="@{/note/read/{id}(id=${note.id})}">
+                                <button class="readmore-btn" type="button">
+                                        <span class="book-wrapper">
+                                          <svg xmlns="http://www.w3.org/2000/svg" fill="rgb(86, 69, 117)"
+                                               viewBox="0 0 126 75" class="book">
+                                            <rect stroke-width="3" stroke="#fff" rx="7.5" height="70" width="121"
+                                                  y="2.5" x="2.5"></rect>
+                                            <line stroke-width="3" stroke="#fff" y2="75" x2="63.5" x1="63.5"></line>
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff"
+                                                  d="M25 20H50"></path>
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff"
+                                                  d="M101 20H76"></path>
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff"
+                                                  d="M16 30L50 30"></path>
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff"
+                                                  d="M110 30L76 30"></path>
+                                          </svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 65 75"
+                                                 class="book-page">
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff"
+                                                  d="M40 20H15"></path>
+                                            <path stroke-linecap="round" stroke-width="4" stroke="#fff"
+                                                  d="M49 30L15 30"></path>
+                                            <path stroke-width="3" stroke="#fff"
+                                                  d="M2.5 2.5H55C59.1421 2.5 62.5 5.85786 62.5 10V65C62.5 69.1421 59.1421 72.5 55 72.5H2.5V2.5Z"></path>
+                                          </svg>
+                                        </span>
+                                    <span class="text">Xem</span>
+                                </button>
+                            </a>
+                            <!-- Nút chức năng sửa ghi chú -->
+                            <div style="display: flex; gap: 10px;">
+                                <a th:href="@{/note/edit/{noteId}(noteId=${note.id})}">
+                                    <button class="edit-btn" type="button">
+                                        Sửa
+                                        <svg class="edit-svg" viewBox="0 0 512 512">
+                                            <path d="M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z"></path>
+                                        </svg>
+                                    </button>
+                                </a>
+                                <!-- Nút chức năng xóa ghi chú vào thùng rác -->
+                                <form th:action="@{/note/move-to-trash/{id}(id=${note.id})}" method="post"
+                                      style="display: inline;">
+                                    <button class="deleteButton">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 50 59"
+                                             class="bin">
+                                            <path fill="#B5BAC1"
+                                                  d="M0 7.5C0 5.01472 2.01472 3 4.5 3H45.5C47.9853 3 50 5.01472 50 7.5V7.5C50 8.32843 49.3284 9 48.5 9H1.5C0.671571 9 0 8.32843 0 7.5V7.5Z"></path>
+                                            <path fill="#B5BAC1"
+                                                  d="M17 3C17 1.34315 18.3431 0 20 0H29.3125C30.9694 0 32.3125 1.34315 32.3125 3V3H17V3Z"></path>
+                                            <path fill="#B5BAC1"
+                                                  d="M2.18565 18.0974C2.08466 15.821 3.903 13.9202 6.18172 13.9202H43.8189C46.0976 13.9202 47.916 15.821 47.815 18.0975L46.1699 55.1775C46.0751 57.3155 44.314 59.0002 42.1739 59.0002H7.8268C5.68661 59.0002 3.92559 57.3155 3.83073 55.1775L2.18565 18.0974ZM18.0003 49.5402C16.6196 49.5402 15.5003 48.4209 15.5003 47.0402V24.9602C15.5003 23.5795 16.6196 22.4602 18.0003 22.4602C19.381 22.4602 20.5003 23.5795 20.5003 24.9602V47.0402C20.5003 48.4209 19.381 49.5402 18.0003 49.5402ZM29.5003 47.0402C29.5003 48.4209 30.6196 49.5402 32.0003 49.5402C33.381 49.5402 34.5003 48.4209 34.5003 47.0402V24.9602C34.5003 23.5795 33.381 22.4602 32.0003 22.4602C30.6196 22.4602 29.5003 23.5795 29.5003 24.9602V47.0402Z"
+                                                  clip-rule="evenodd" fill-rule="evenodd"></path>
+                                            <path fill="#B5BAC1" d="M2 13H48L47.6742 21.28H2.32031L2 13Z"></path>
+                                        </svg>
+                                        <span class="tooltip">Delete</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!--Nút thùng rác-->
+        <button class="custom-button" style="margin-bottom: 5px" onclick="window.location.href='/note/trash'">
+            <svg viewBox="0 0 448 512" class="custom-svgIcon">
+                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path>
+            </svg>
+        </button>
+    </div>
+</section>
+<script>
+    function moveToTrash(noteId) {
+        if (confirm('Bạn có chắc chắn muốn chuyển ghi chú này vào thùng rác không?')) {
+            window.location.href = '/note/delete/' + noteId;
+        }
+    }
+
+    let previousSearchTerm = '';
+
+    document.getElementById('searchInput').addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (searchTerm.length > 0) {
+                previousSearchTerm = searchTerm;
+                window.location.href = `/note/search/findByContentStartingWith/${encodeURIComponent(searchTerm)}`;
+            }
+        }
+    });
+
+    window.onload = function () {
+        document.getElementById('searchInput').value = previousSearchTerm;
+    };
+
+    document.getElementById('notificationButton').addEventListener('click', function () {
+        const popup = document.getElementById('notificationPopup');
+        if (popup.style.display === 'none' || popup.style.display === '') {
+            popup.style.display = 'block';
+            setTimeout(() => {
+                popup.style.opacity = '1';
+                popup.style.transform = 'translateY(0)';
+            }, 10);
+        } else {
+            popup.style.opacity = '0';
+            popup.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 300);
+        }
+    });
+
+    window.addEventListener('click', function (e) {
+        const button = document.getElementById('notificationButton');
+        const popup = document.getElementById('notificationPopup');
+        if (!button.contains(e.target) && !popup.contains(e.target)) {
+            popup.style.opacity = '0';
+            popup.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 300);
+        }
+    });
+
+    document.getElementById('notificationButton').addEventListener('click', function () {
+        const popup = document.getElementById('notificationPopup');
+        const notificationList = popup.querySelector('ul');
+        const showMoreBtn = document.getElementById('showMoreBtn');
+
+        fetch('/note/api/notifications')
+            .then(response => response.json())
+            .then(data => {
+                notificationList.innerHTML = '';
+
+                if (data.length === 0) {
+                    notificationList.innerHTML = '<li class="list-group-item">Chưa có thông báo nào</li>';
+                } else {
+                    data.slice(0, 3).forEach(notification => {
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('list-group-item');
+                        listItem.innerHTML = `
+                        <p class="font-weight-bold mb-1">${notification.title}</p>
+                        <p class="text-muted mb-0">${notification.content}</p>
+                    `;
+                        notificationList.appendChild(listItem);
+                    });
+
+                    if (data.length > 3) {
+                        showMoreBtn.style.display = 'block';
+                        showMoreBtn.addEventListener('click', function () {
+                            notificationList.innerHTML = '';
+                            data.forEach(notification => {
+                                const listItem = document.createElement('li');
+                                listItem.classList.add('list-group-item');
+                                listItem.innerHTML = `
+                                <p class="font-weight-bold mb-1">${notification.title}</p>
+                                <p class="text-muted mb-0">${notification.content}</p>
+                                <hr/>
+                            `;
+                                notificationList.appendChild(listItem);
+                            });
+                            showMoreBtn.style.display = 'none';
+                        });
+                    } else {
+                        showMoreBtn.style.display = 'none';
+                    }
+                }
+
+                popup.classList.add('show');
+            });
+
+        window.addEventListener('click', function (e) {
+            if (!popup.contains(e.target) && e.target !== document.getElementById('notificationButton')) {
+                popup.classList.remove('show');
+            }
+        });
+    });
+</script>
+</body>
+</html>

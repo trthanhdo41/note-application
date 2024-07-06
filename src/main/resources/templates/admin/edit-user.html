@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit User</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        h2 {
+            color: #343a40;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .notification {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 15px;
+            opacity: 0;
+            text-align: center;
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            animation: fall 3s ease-in-out forwards, fadeInOut 6s forwards;
+        }
+
+        @keyframes fall {
+            0% {
+                top: 10px;
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            70% {
+                top: calc(100vh - 150px);
+            }
+            75% {
+                top: calc(100vh - 130px);
+            }
+            80% {
+                top: calc(100vh - 150px);
+            }
+            85% {
+                top: calc(100vh - 140px);
+            }
+            90% {
+                top: calc(100vh - 150px);
+            }
+            95% {
+                top: calc(100vh - 145px);
+            }
+            100% {
+                top: calc(100vh - 150px);
+            }
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        input[type="text"], input[type="email"], select {
+            transition: box-shadow 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, select:focus {
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Edit User</h2>
+
+    <!-- Thông báo -->
+    <div th:if="${message}" th:classappend="${alertClass}" class="notification" id="notification">
+        <span th:text="${message}"></span>
+    </div>
+
+    <form th:action="@{'/admin/edit/' + ${user.id}}" th:object="${user}" method="post">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" th:field="*{username}" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" th:field="*{fullName}" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" th:field="*{email}" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label for="title">Title</label>
+            <select id="title" th:field="*{title}" class="form-control" required>
+                <option value="Mr">Mr</option>
+                <option value="Ms">Ms</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="role">Role</label>
+            <select id="role" th:field="*{role}" class="form-control" required>
+                <option value="USER" th:selected="${user.role == 'ROLE_USER'}" th:if="${currentUserRole == 'ROLE_ADMIN' || currentUserRole == 'ROLE_MANAGER'}">USER</option>
+                <option value="VIPMEMBER" th:selected="${user.role == 'ROLE_VIPMEMBER'}" th:if="${currentUserRole == 'ROLE_ADMIN' || currentUserRole == 'ROLE_MANAGER'}">VIPMEMBER</option>
+                <option value="MANAGER" th:selected="${user.role == 'ROLE_MANAGER'}" th:if="${currentUserRole == 'ROLE_ADMIN'}">MANAGER</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="active">Active</label>
+            <select id="active" th:field="*{active}" class="form-control" required>
+                <option value="1">BẬT</option>
+                <option value="0">TẮT</option>
+            </select>
+        </div>
+        <div class="form-group" th:if="${user.totpSecret != null}">
+            <label for="totpSecretCheckbox">2FA</label>
+            <input type="checkbox" id="totpSecretCheckbox" onclick="handle2FACheckbox()"> TẮT
+            <input type="hidden" id="totpSecretField" th:field="*{totpSecret}" data-original-value="[[${user.totpSecret}]]"/>
+        </div>
+        <div class="d-flex justify-content-between">
+            <a href="/admin" class="btn btn-secondary">Back</a>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+</div>
+<script>
+    function handle2FACheckbox() {
+        var checkbox = document.getElementById("totpSecretCheckbox");
+        var totpSecretField = document.getElementById("totpSecretField");
+        if (checkbox.checked) {
+            totpSecretField.value = "";
+        } else {
+            totpSecretField.value = totpSecretField.getAttribute("data-original-value");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var notification = document.getElementById("notification");
+        if (notification) {
+            notification.style.opacity = "1";
+
+            setTimeout(function() {
+                notification.style.opacity = "1";
+            }, 2000);
+
+            setTimeout(function() {
+                notification.style.transition = "opacity 3s";
+                notification.style.opacity = "0";
+            }, 8000);
+        }
+    });
+
+
+</script>
+</body>
+</html>

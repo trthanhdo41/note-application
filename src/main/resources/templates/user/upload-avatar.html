@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Avatar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f9;
+            font-family: 'Poppins', sans-serif;
+        }
+        .avatar-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+            margin: 20px auto; /* Center the container */
+        }
+        .avatar-container:hover {
+            transform: translateY(-5px);
+        }
+        .avatar-container h2 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333333;
+        }
+        .avatar-container p {
+            font-size: 16px;
+            color: #666666;
+            margin-bottom: 30px;
+        }
+        .avatar {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 4px solid #dddddd;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .avatar:hover {
+            transform: scale(1.05);
+        }
+        .btn-upload, .btn-delete {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            outline: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-upload {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        .btn-upload:hover {
+            background-color: #0056b3;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: #ffffff;
+            margin-top: 10px;
+        }
+        .btn-delete:hover {
+            background-color: #b02a37;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #333333;
+            display: block;
+            text-align: left;
+        }
+        .alert {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .modal-dialog {
+            max-width: 800px;
+        }
+        .modal-content {
+            border-radius: 12px;
+        }
+        .modal-body img {
+            width: 100%;
+            border-radius: 12px;
+        }
+        .btn-back {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            outline: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background-color: #6c757d;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+
+        .navbar-brand-custom {
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold; /* Đặt độ đậm cho font */
+        }
+
+        .navbar-nav-custom .nav-link-custom {
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold; /* Đặt độ đậm cho font */
+        }
+
+        .larger-text-custom {
+            font-size: 1.2rem;
+        }
+
+        .btnn-custom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 13rem;
+            overflow: hidden;
+            height: 3rem;
+            background-size: 300% 300%;
+            backdrop-filter: blur(1rem);
+            border-radius: 5rem;
+            transition: 0.5s;
+            animation: gradient_301 5s ease infinite;
+            border: double 4px transparent;
+            background-image: linear-gradient(#212121, #212121), linear-gradient(137.48deg, #ffdb3b 10%, #FE53BB 45%, #8F51EA 67%, #0044ff 87%);
+            background-origin: border-box;
+            background-clip: content-box, border-box;
+        }
+
+        #container-stars-custom {
+            position: absolute;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            transition: 0.5s;
+            backdrop-filter: blur(1rem);
+            border-radius: 5rem;
+        }
+
+        strong {
+            z-index: 2;
+            font-family: 'Avalors Personal Use';
+            font-size: 15px;
+            letter-spacing: 5px;
+            color: #FFFFFF;
+            text-shadow: 0 0 4px white;
+        }
+
+        #glow-custom {
+            position: absolute;
+            display: flex;
+            width: 12rem;
+        }
+
+        .circle-custom {
+            width: 100%;
+            height: 30px;
+            filter: blur(2rem);
+            animation: pulse_3011 4s infinite;
+            z-index: -1;
+        }
+
+        .circle-custom:nth-of-type(1) {
+            background: rgba(254, 83, 186, 0.636);
+        }
+
+        .circle-custom:nth-of-type(2) {
+            background: rgba(142, 81, 234, 0.704);
+        }
+
+        .btnn-custom:hover #container-stars-custom {
+            z-index: 1;
+            background-color: #212121;
+        }
+
+        .btnn-custom:hover {
+            transform: scale(1.1)
+        }
+
+        .btnn-custom:active {
+            border: double 4px #FE53BB;
+            background-origin: border-box;
+            background-clip: content-box, border-box;
+            animation: none;
+        }
+
+        .btnn-custom:active .circle-custom {
+            background: #FE53BB;
+        }
+
+        #stars-custom {
+            position: relative;
+            background: transparent;
+            width: 200rem;
+            height: 200rem;
+        }
+
+        #stars-custom::after {
+            content: "";
+            position: absolute;
+            top: -10rem;
+            left: -100rem;
+            width: 100%;
+            height: 100%;
+            animation: animStarRotate 90s linear infinite;
+        }
+
+        #stars-custom::after {
+            background-image: radial-gradient(#ffffff 1px, transparent 1%);
+            background-size: 50px 50px;
+        }
+
+        #stars-custom::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 170%;
+            height: 500%;
+            animation: animStar 60s linear infinite;
+        }
+
+        #stars-custom::before {
+            background-image: radial-gradient(#ffffff 1px, transparent 1%);
+            background-size: 50px 50px;
+            opacity: 0.5;
+        }
+
+        @keyframes animStar {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-135rem);
+            }
+        }
+
+        @keyframes animStarRotate {
+            from {
+                transform: rotate(360deg);
+            }
+
+            to {
+                transform: rotate(0);
+            }
+        }
+
+        @keyframes gradient_301 {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes pulse_3011 {
+            0% {
+                transform: scale(0.75);
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+            }
+
+            100% {
+                transform: scale(0.75);
+                box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+            }
+        }
+
+        .logout-btn-custom {
+            --black: #000000;
+            --ch-black: #141414;
+            --eer-black: #1b1b1b;
+            --night-rider: #2e2e2e;
+            --white: #ffffff;
+            --af-white: #f3f3f3;
+            --ch-white: #e1e1e1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition-duration: .3s;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+            background-color: var(--night-rider);
+        }
+
+        .logout-sign-custom {
+            width: 100%;
+            transition-duration: .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logout-sign-custom svg {
+            width: 17px;
+        }
+
+        .logout-sign-custom svg path {
+            fill: var(--af-white);
+        }
+
+        .logout-text-custom {
+            position: absolute;
+            right: 0%;
+            width: 0%;
+            opacity: 0;
+            color: var(--af-white);
+            font-size: 1.2em;
+            font-weight: 600;
+            transition-duration: .3s;
+        }
+
+        .logout-btn-custom:hover {
+            width: 125px;
+            border-radius: 5px;
+            transition-duration: .3s;
+        }
+
+        .logout-btn-custom:hover .logout-sign-custom {
+            width: 30%;
+            transition-duration: .3s;
+            padding-left: 20px;
+        }
+
+        .logout-btn-custom:hover .logout-text-custom {
+            opacity: 1;
+            width: 70%;
+            transition-duration: .3s;
+            padding-right: 10px;
+        }
+
+        .logout-btn-custom:active {
+            transform: translate(2px, 2px);
+        }
+
+        #btn-message-custom {
+            --text-color: #000;
+            --bg-color-sup: #d2d2d2;
+            --bg-color: #f4f4f4;
+            --bg-hover-color: #ffffff;
+            --online-status: #00da00;
+            --font-size: 16px;
+            --btn-transition: all 0.2s ease-out;
+        }
+
+        .button-message-custom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font: 400 var(--font-size) Helvetica Neue, sans-serif;
+            box-shadow: 0 0 2.17382px rgba(0,0,0,.049),0 1.75px 6.01034px rgba(0,0,0,.07),0 3.63px 14.4706px rgba(0,0,0,.091),0 22px 48px rgba(0,0,0,.14);
+            background-color: var(--bg-color);
+            border-radius: 68px;
+            cursor: pointer;
+            padding: 6px 10px 6px 6px;
+            width: fit-content;
+            height: 40px;
+            border: 0;
+            overflow: hidden;
+            position: relative;
+            transition: var(--btn-transition);
+        }
+
+        .button-message-custom:hover {
+            height: 56px;
+            padding: 8px 20px 8px 8px;
+            background-color: var(--bg-hover-color);
+            transition: var(--btn-transition);
+        }
+
+        .button-message-custom:active {
+            transform: scale(0.99);
+        }
+
+        .content-avatar-custom {
+            width: 30px;
+            height: 30px;
+            margin: 0;
+            transition: var(--btn-transition);
+            position: relative;
+        }
+
+        .button-message-custom:hover .content-avatar-custom {
+            width: 40px;
+            height: 40px;
+        }
+
+        .avatar-custom {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: var(--bg-color-sup);
+        }
+
+        .user-img-custom {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .status-user-custom {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            right: 1px;
+            bottom: 1px;
+            border-radius: 50%;
+            outline: solid 2px var(--bg-color);
+            background-color: var(--online-status);
+            transition: var(--btn-transition);
+            animation: active-status 2s ease-in-out infinite;
+        }
+
+        .button-message-custom:hover .status-user-custom {
+            width: 10px;
+            height: 10px;
+            right: 1px;
+            bottom: 1px;
+            outline: solid 3px var(--btn-hover-color);
+        }
+
+        .notice-content-custom {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            padding-left: 8px;
+            text-align: initial;
+            color: var(--text-color);
+        }
+
+        .username-custom {
+            letter-spacing: -6px;
+            height: 0;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: var(--btn-transition);
+        }
+
+        .user-id-custom {
+            font-size: 12px;
+            letter-spacing: -6px;
+            height: 0;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--btn-transition);
+        }
+
+        .lable-message-custom {
+            display: flex;
+            align-items: center;
+            opacity: 1;
+            transform: scaleY(1);
+            transition: var(--btn-transition);
+        }
+
+        .button-message-custom:hover .username-custom {
+            height: auto;
+            letter-spacing: normal;
+            opacity: 1;
+            transform: translateY(0);
+            transition: var(--btn-transition);
+        }
+
+        .button-message-custom:hover .user-id-custom {
+            height: auto;
+            letter-spacing: normal;
+            opacity: 1;
+            transform: translateY(0);
+            transition: var (--btn-transition);
+        }
+
+        .button-message-custom:hover .lable-message-custom {
+            height: 0;
+            transform: scaleY(0);
+            transition: var(--btn-transition);
+        }
+
+        .lable-message-custom, .username-custom {
+            font-weight: 600;
+        }
+
+        .number-message-custom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-left: 8px;
+            font-size: 12px;
+            width: 16px;
+            height: 16px;
+            background-color: var(--bg-color-sup);
+            border-radius: 20px;
+        }
+
+        @keyframes active-status {
+            0% {
+                background-color: var(--online-status);
+            }
+
+            33.33% {
+                background-color: #93e200;
+            }
+
+            66.33% {
+                background-color: #93e200;
+            }
+
+            100% {
+                background-color: var(--online-status);
+            }
+        }
+        #cameraStream {
+            width: 100%;
+            height: auto;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<header class="bg-gray-500 text-white">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand-custom text-warning" th:href="@{/home}" style="font-family: 'Roboto', sans-serif;">Note Myself</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="d-flex justify-content-between align-items-center ml-auto auth-container" th:if="${#authorization.expression('isAuthenticated()')}">
+                <button id="btn-message-custom" class="button-message-custom" style="right: 10px" onclick="window.location.href='/user/information'">
+                    <div class="content-avatar-custom">
+                        <div class="status-user-custom"></div>
+                        <div class="avatar-custom">
+                            <svg class="user-img-custom" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,12.5c-3.04,0-5.5,1.73-5.5,3.5s2.46,3.5,5.5,3.5,5.5-1.73,5.5-3.5-2.46-3.5-5.5-3.5Zm0-.5c1.66,0,3-1.34,3-3s-1.34-3-3-3-3,1.34-3,3,1.34,3,3,3Z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="notice-content-custom">
+                        <div class="username-custom">Xin chào</div>
+                        <div class="lable-message-custom">Information<span class="number-message-custom">0</span></div>
+                        <div class="user-id-custom">@<span th:text="${#authentication.principal.username}">username</span></div>
+                    </div>
+                </button>
+                <div id="authLinks">
+                    <div th:if="${#authorization.expression('isAuthenticated()')}">
+                        <form id="logoutForm" th:action="@{/logout}" method="post" onsubmit="handleLogout(event)" style="display: inline;">
+                            <button type="submit" class="logout-btn-custom">
+                                <div class="logout-sign-custom">
+                                    <svg viewBox="0 0 512 512">
+                                        <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path>
+                                    </svg>
+                                </div>
+                                <div class="logout-text-custom">Logout</div>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="avatar-container">
+    <button class="btn-back" onclick="history.back();">Quay lại</button>
+    <h2>Đăng tải Avatar</h2>
+    <p>Chọn hình ảnh để đại diện cho bạn</p>
+    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <form id="avatarForm" th:action="@{/user/{id}/avatar(id=${user.id})}" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="avatar" class="form-label">Chọn Avatar</label>
+            <input type="file" class="form-control" id="avatar" name="avatar" accept="image/jpeg,image/png">
+        </div>
+        <div class="mb-3">
+            <button type="button" class="btn btn-camera" data-bs-toggle="modal" data-bs-target="#cameraModal" style="background-color: #a8a8a847; color: black;">
+                <img src="https://static-00.iconduck.com/assets.00/camera-icon-2048x1665-tjx7d3d2.png" alt="Camera" style="width: 33px; height: auto; margin-right: 5px;">
+                Mở Camera
+            </button>
+        </div>
+        <img id="capturedImage" alt="Ảnh đã chụp" style="display: none; width: 100%; height: auto; border-radius: 12px; margin-bottom: 10px;"/>
+        <input type="hidden" id="capturedImageData" name="capturedImageData">
+        <button type="submit" class="btn btn-upload">Tải lên</button>
+    </form>
+
+    <div th:if="${user.avatar != null}" class="text-center mt-4">
+        <h3 class="mb-4">Avatar hiện tại</h3>
+        <img th:src="@{${user.avatar}}" alt="Avatar" class="avatar" data-bs-toggle="modal" data-bs-target="#avatarModal">
+        <form th:action="@{/user/{id}/avatar/delete(id=${user.id})}" method="post">
+            <button type="submit" class="btn btn-delete">Xóa Avatar</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal for Camera -->
+<div class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cameraModalLabel">Chụp Ảnh</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="filters mb-3 text-center">
+                    <button type="button" class="btn btn-light" onclick="applyFilter('none')">None</button>
+                    <button type="button" class="btn btn-light" onclick="applyFilter('grayscale(100%)')">Grayscale</button>
+                    <button type="button" class="btn btn-light" onclick="applyFilter('sepia(100%)')">Sepia</button>
+                    <button type="button" class="btn btn-light" onclick="applyFilter('invert(100%)')">Invert</button>
+                    <button type="button" class="btn btn-light" onclick="applyFilter('contrast(200%)')">Contrast</button>
+                    <button type="button" class="btn btn-light" onclick="applyFilter('brightness(1.2) saturate(1.3)')">Beauty</button>
+                </div>
+                <video id="cameraStream" autoplay style="transform: scaleX(-1); width: 100%;"></video>
+                <canvas id="cameraCanvas" style="display: none;"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="captureButton" class="btn btn-success">Chụp ảnh</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for displaying the current avatar -->
+<div class="modal fade" id="avatarModal" tabindex="-1" aria-labelledby="avatarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img th:src="@{${user.avatar}}" alt="Avatar">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function applyFilter(filter) {
+        const video = document.getElementById('cameraStream');
+        video.style.filter = filter;
+    }
+
+    document.querySelector('#cameraModal').addEventListener('shown.bs.modal', async function () {
+        const video = document.getElementById('cameraStream');
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            video.style.display = 'block';
+        } catch (err) {
+            console.error('Lỗi: Không thể truy cập camera', err);
+        }
+    });
+
+    document.querySelector('#cameraModal').addEventListener('hidden.bs.modal', function () {
+        const video = document.getElementById('cameraStream');
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
+        video.style.display = 'none';
+    });
+
+    document.getElementById('captureButton').addEventListener('click', function() {
+        const video = document.getElementById('cameraStream');
+        const canvas = document.getElementById('cameraCanvas');
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.save();
+        context.scale(-1, 1);  // Mirror the image
+        context.filter = video.style.filter;  // Apply the selected filter
+        context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+        context.restore();
+
+        canvas.toBlob(function(blob) {
+            const file = new File([blob], "avatar.jpg", { type: "image/jpeg" });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            document.getElementById('avatar').files = dataTransfer.files;
+
+            const dataUrl = URL.createObjectURL(blob);
+            const capturedImage = document.getElementById('capturedImage');
+            capturedImage.src = dataUrl;
+            capturedImage.style.display = 'block';
+        }, 'image/jpeg', 0.8);
+
+        const cameraModal = document.querySelector('#cameraModal');
+        const modal = bootstrap.Modal.getInstance(cameraModal);
+        modal.hide();
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
