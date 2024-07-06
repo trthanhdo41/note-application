@@ -52,8 +52,8 @@ A comprehensive web-based note application built with Java, Spring Boot, and MyS
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/trthanhdo41/noteMyself.git](https://github.com/trthanhdo41/note-application.git
-   cd noteMyself
+   git clone https://github.com/trthanhdo41/note-application.git
+   cd note-application
    
 2.	Set up the database:
    ![erd](https://github.com/trthanhdo41/note-application/assets/136252271/2013d522-4e0d-41e0-b7c3-7e24654bc519)
