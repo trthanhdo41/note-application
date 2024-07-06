@@ -57,8 +57,8 @@ A comprehensive web-based note application built with Java, Spring Boot, and MyS
    
 2.	Set up the database:
    ![erd](https://github.com/trthanhdo41/note-application/assets/136252271/2013d522-4e0d-41e0-b7c3-7e24654bc519)
-	•	Create a MySQL database.
-	•	Import the database backup file (database_backup.sql) into your MySQL database:
+	•	Create a MySQL database named note_app and run the program.
+	•	Or import the database backup file (database_backup.sql) into your MySQL database:
       mysql -u [username] -p [database_name] < database_backup.sql
   	
 4.	Update the database configuration:
